@@ -1,0 +1,108 @@
+@layer theme, base, mui, components, utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+@theme {
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+}
+
+@theme inline {
+  /* Core Material UI typography */
+  --font-h1: var(--mui-font-h1);
+  --font-h2: var(--mui-font-h2);
+  --font-h3: var(--mui-font-h3);
+  --font-h4: var(--mui-font-h4);
+  --font-h5: var(--mui-font-h5);
+  --font-h6: var(--mui-font-h6);
+  --font-body1: var(--mui-font-body1);
+  --font-body2: var(--mui-font-body2);
+
+  /* Core Material UI breakpoints */
+  --breakpoint-sm: 37.5rem; /* 600px */
+  --breakpoint-md: 56.25rem; /* 900px */
+  --breakpoint-lg: 75rem; /* 1200px */
+  --breakpoint-xl: 96rem; /* 1536px */
+
+  /* Core Material UI Semantic Colors */
+  --color-primary: var(--mui-palette-primary-main);
+  --color-secondary: var(--mui-palette-secondary-main);
+  --color-error: var(--mui-palette-error-main);
+  --color-success: var(--mui-palette-success-main);
+  --color-warning: var(--mui-palette-warning-main);
+  --color-info: var(--mui-palette-info-main);
+
+  /* Core Text & Backgrounds */
+  --color-text-primary: var(--mui-palette-text-primary);
+  --color-text-secondary: var(--mui-palette-text-secondary);
+  --color-divider: var(--mui-palette-divider);
+
+  /* Minimal generic shadows (1-4 usually covers most basic elevation needs) */
+  --shadow-1: var(--mui-shadows-1);
+  --shadow-2: var(--mui-shadows-2);
+  --shadow-3: var(--mui-shadows-3);
+  --shadow-4: var(--mui-shadows-4);
+}
+
+/* Material UI base styles */
+@layer base {
+  h1 {
+    font: var(--mui-font-h1);
+    letter-spacing: -0.01562em;
+  }
+  h2 {
+    font: var(--mui-font-h2);
+    letter-spacing: -0.00833em;
+  }
+  h3 {
+    font: var(--mui-font-h3);
+  }
+  h4 {
+    font: var(--mui-font-h4);
+    letter-spacing: 0.00735em;
+  }
+  h5 {
+    font: var(--mui-font-h5);
+  }
+  h6 {
+    font: var(--mui-font-h6);
+    letter-spacing: 0.0075em;
+  }
+  p {
+    font: var(--mui-font-body1);
+    letter-spacing: 0.00938em;
+  }
+  span {
+    font: var(--mui-font-body2);
+    letter-spacing: 0.01071em;
+  }
+}
+
+/* Typography & Elevation utilities */
+@utility typography-* {
+  font: --value(--font-*);
+}
+@utility elevation-* {
+  box-shadow: --value(--shadow-*);
+}
+
+/* Tailwind CSS v3 border compatibility */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* App-level Root Variables */
+:root {
+  --header-height: 70px;
+  --content-min-height: calc(100svh - var(--header-height));
+}
+
+body {
+  min-height: 100svh;
+}

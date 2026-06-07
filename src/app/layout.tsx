@@ -1,19 +1,12 @@
 import Head from "next/head";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { Roboto } from "next/font/google";
+import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
-import theme from "./theme";
-import "./globals.css";
+import theme from "../styles/theme";
+import "../styles/globals.css";
 import Header from "../components/layouts/Header";
 import PageLayout from "../components/layouts/PageLayout";
 import { Metadata } from "next";
-
-const roboto = Roboto({
-  weight: ["300", "400", "500", "700"],
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-roboto",
-});
 
 export const metadata: Metadata = {
   title: "Baeda",
@@ -22,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={roboto.variable}>
+    <html lang="en">
       <Head>
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
@@ -32,6 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Header />
             <PageLayout>{children}</PageLayout>
           </ThemeProvider>
