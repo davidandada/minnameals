@@ -8,12 +8,11 @@ export default async function Home() {
   const cookieStore = await cookies();
   const headersList = await headers();
 
-  const host = headersList.get("host");
-  const protocol = host?.includes("localhost") ? "http" : "https";
-  const baseUrl = host ? `${protocol}://${host}` : `https://${process.env.VERCEL_URL}`;
+  const baseUrl =
+    process.env.NODE_ENV === "development" ? "http://localhost:3000" : `https://${process.env.VERCEL_URL}`;
   const cookieHeader = cookieStore.toString();
 
-  const res = await fetch(`${baseUrl}/api/todos`, {
+  const res = await fetch(`${baseUrl}/api/v1/list_items`, {
     headers: { Cookie: cookieHeader },
   });
   if (!res.ok) {
