@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconButton, TextField } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
-import { submitPasswordAction } from "../../app/password/page";
+import { submitPasswordAction } from "../../app/password/actions";
 
 export default function PasswordForm() {
   const router = useRouter();
