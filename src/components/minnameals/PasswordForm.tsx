@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { IconButton, TextField } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import { submitPasswordAction } from "../../app/password/page";
 
 export default function PasswordForm() {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(false);
@@ -18,7 +20,7 @@ export default function PasswordForm() {
     if (!success) {
       setError(true);
       setIsSubmitting(false);
-    }
+    } else router.push("/");
   };
 
   return (

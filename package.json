@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "eslint": "eslint .",
+    "tsc": "tsc --noEmit",
+    "lint": "concurrently -c \"cyan,magenta\" \"pnpm run eslint\" \"pnpm run tsc\""
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -29,6 +31,7 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "eslint": "9.39.4",
     "eslint-config-prettier": "^10.1.8"
   }
