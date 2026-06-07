@@ -31,10 +31,13 @@ export default function PasswordForm() {
         onChange={(e) => setPassword(e.target.value)}
         value={password}
         variant="standard"
+        className="text-neutral-800 dark:text-neutral-200"
       />
-      <IconButton aria-label="submit" onClick={handleLogin} disabled={isSubmitting}>
-        <LoginIcon />
-      </IconButton>
+      <div className="flex items-end">
+        <IconButton aria-label="submit" onClick={handleLogin} disabled={isSubmitting}>
+          <LoginIcon />
+        </IconButton>
+      </div>
     </div>
   );
 }

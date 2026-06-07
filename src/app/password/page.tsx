@@ -22,7 +22,7 @@ export async function submitPasswordAction(password: string) {
 
 export default async function Password() {
   return (
-    <section className="h-inherit w-full flex items-center justify-center">
+    <section className="min-h-[inherit] w-full flex items-center justify-center">
       <PasswordForm />
     </section>
   );
