@@ -1,6 +1,6 @@
 "use server";
 
-import PasswordForm from "../../components/PasswordForm";
+import PasswordForm from "../../components/minnameals/PasswordForm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -22,8 +22,8 @@ export async function submitPasswordAction(password: string) {
 
 export default async function Password() {
   return (
-    <main>
+    <section className="min-h-[inherit] w-full flex items-center justify-center">
       <PasswordForm />
-    </main>
+    </section>
   );
 }
