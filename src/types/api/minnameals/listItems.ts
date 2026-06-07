@@ -1,4 +1,4 @@
-export type ListItem = {
+export type ListItemApi = {
   id: number;
   item: string;
   is_checked: boolean;

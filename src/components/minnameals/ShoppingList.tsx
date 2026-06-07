@@ -17,7 +17,7 @@ import {
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import { type ListItem } from "../../types/api/minnameals/listItems";
+import { type ListItemApi } from "../../types/api/minnameals/listItems";
 
 type Props = {
   data: ListItem[];
