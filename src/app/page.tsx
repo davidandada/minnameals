@@ -1,23 +1,13 @@
-import { cookies, headers } from "next/headers";
 import { Typography } from "@mui/material";
 import ShoppingList from "../components/minnameals/ShoppingList";
+import appFetch from "./api/fetch";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const headersList = await headers();
-
-  const baseUrl =
-    process.env.NODE_ENV === "development" ? "http://localhost:3000" : `https://${process.env.VERCEL_URL}`;
-  const cookieHeader = cookieStore.toString();
-
-  const res = await fetch(`${baseUrl}/api/v1/list_items`, {
-    headers: { Cookie: cookieHeader },
-  });
+  const res = await appFetch("v1/list_items");
   if (!res.ok) {
     console.error(`Flask API Error: ${res.status} ${res.statusText}`);
-    throw new Error("Failed to fetch list");
   }
   const listData = await res.json();
 
