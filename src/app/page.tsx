@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import ShoppingList from "../components/minnameals/ShoppingList";
 
 export default async function Home() {
@@ -10,6 +11,9 @@ export default async function Home() {
   console.log(listData);
   return (
     <main>
+      <Typography variant="h6" component="h2" className="text-center mb-2">
+        Shopping list
+      </Typography>
       <ShoppingList data={listData} />
     </main>
   );
