@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, jsonify
 from supabase import create_client
 
 #------------------------------
