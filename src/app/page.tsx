@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Typography } from "@mui/material";
 import ShoppingList from "../components/minnameals/ShoppingList";
 
