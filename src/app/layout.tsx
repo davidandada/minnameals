@@ -4,6 +4,9 @@ import { Roboto } from "next/font/google";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import "./globals.css";
+import Header from "../components/layouts/Header";
+import PageLayout from "../components/layouts/PageLayout";
+import { Metadata } from "next";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -12,7 +15,7 @@ const roboto = Roboto({
   variable: "--font-roboto",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Baeda",
   description: "All things David and Ada",
 };
@@ -28,7 +31,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </Head>
       <body>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <Header />
+            <PageLayout>{children}</PageLayout>
+          </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

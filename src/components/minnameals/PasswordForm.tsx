@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { IconButton, TextField } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
-import { submitPasswordAction } from "../app/password/page";
+import { submitPasswordAction } from "../../app/password/page";
 
 export default function PasswordForm() {
   const [password, setPassword] = useState("");
