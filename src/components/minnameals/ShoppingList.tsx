@@ -20,7 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { type ListItemApi } from "../../types/api/minnameals/listItems";
 
 type Props = {
-  data: ListItem[];
+  data: ListItemApi[];
 };
 
 export default function ShoppingList({ data }: Props) {
