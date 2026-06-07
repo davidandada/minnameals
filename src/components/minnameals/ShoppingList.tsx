@@ -81,16 +81,14 @@ export default function ShoppingList({ data }: Props) {
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: 600, bgcolor: "background.paper", marginInline: "auto" }}>
-      <List>
-        {renderList()}
-        <Divider />
-        <ListItem>
-          <Button className="w-full" startIcon={<AddIcon />}>
-            Add item
-          </Button>
-        </ListItem>
-      </List>
-    </Box>
+    <List>
+      {renderList()}
+      <Divider />
+      <ListItem>
+        <Button className="w-full" color="baedaYellow" startIcon={<AddIcon />}>
+          Add item
+        </Button>
+      </ListItem>
+    </List>
   );
 }
