@@ -30,19 +30,8 @@ const customPaletteOptions = Object.entries(brandColours).reduce(
 const theme = createTheme({
   cssVariables: true,
   typography: {
-    fontFamily: [
-      'Inter',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(','),
+    fontFamily: ['Inter', 'sans-serif'].join(','),
+    fontWeightRegular: 600,
   },
   palette: {
     mode: 'dark',

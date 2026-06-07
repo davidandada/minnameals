@@ -13,9 +13,6 @@ export default async function Home() {
 
   return (
     <main>
-      <Typography variant="h6" component="h2" className="text-center mb-2">
-        Shopping list
-      </Typography>
       <ShoppingList data={listData} />
     </main>
   );
