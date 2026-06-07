@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { Typography } from "@mui/material";
 import ShoppingList from "../components/minnameals/ShoppingList";
 
@@ -6,9 +6,13 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const cookieStore = await cookies();
+  const headersList = await headers();
 
+  const host = headersList.get("host");
+  const protocol = host?.includes("localhost") ? "http" : "https";
+  const baseUrl = host ? `${protocol}://${host}` : `https://${process.env.VERCEL_URL}`;
   const cookieHeader = cookieStore.toString();
-  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+
   const res = await fetch(`${baseUrl}/api/todos`, {
     headers: { Cookie: cookieHeader },
   });
