@@ -31,7 +31,7 @@ export default function ShoppingList({ data }: Props) {
 
   const [uncheckedItems, checkedItems] = useMemo(() => {
     if (!data || !data.length) return [[], []];
-    return data.reduce(
+    return data.reduce<[ListItemApi[], ListItemApi[]]>(
       (acc, item) => {
         if (item.is_checked || checked.includes(item.id)) {
           acc[1].push(item);
@@ -57,7 +57,7 @@ export default function ShoppingList({ data }: Props) {
     setChecked(newChecked);
   };
 
-  const renderList = (items) => {
+  const renderList = (items: ListItemApi[]) => {
     if (!items || !items.length) return null;
     return (
       <>
