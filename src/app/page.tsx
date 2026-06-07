@@ -8,7 +8,7 @@ export default async function Home() {
     throw new Error("Failed to fetch list");
   }
   const listData = await res.json();
-  console.log(listData);
+
   return (
     <main>
       <Typography variant="h6" component="h2" className="text-center mb-2">

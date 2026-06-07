@@ -68,7 +68,7 @@ export default function ShoppingList({ data }: Props) {
               />
             </ListItemIcon>
             <ListItemText
-              id={listItem.id}
+              id={`shopping-list-item-${listItem.id}`}
               primary={listItem.item}
               className={classNames({
                 "line-through": isChecked,
