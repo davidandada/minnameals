@@ -1,11 +1,9 @@
 import { Typography } from "@mui/material";
+import Image from "next/image";
 
 export default function Header() {
   return (
-    <header className="h-(--header-height) w-full flex items-center px-4">
-      <Typography variant="h3" component="h1">
-        Minna皆Meals
-      </Typography>
+      <Image src="/images/minnameals/header.svg" alt="Minna Meals" width={221} height={36} />
     </header>
   );
 }
