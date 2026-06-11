@@ -1,6 +1,7 @@
 import os
 from flask import request, jsonify
 
+
 def is_cookie_valid():
     auth_password = os.getenv("APP_PASSWORD")
     app_password = request.cookies.get('app_password')
@@ -11,6 +12,4 @@ def is_cookie_valid():
 
 
 def is_user_authenticated():
-    authenticated = is_cookie_valid()
-    if not authenticated:
-        return jsonify({ "message": "You are not authenticated "}), 401
+    return is_cookie_valid()
