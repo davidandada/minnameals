@@ -12,6 +12,9 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides extends Record<CustomColorName, true> { }
 }
+declare module '@mui/material/InputBase' {
+  interface InputBasePropsColorOverrides extends Record<CustomColorName, true> { }
+}
 
 const customPaletteOptions = Object.entries(brandColours).reduce(
   (acc, [colorName, colorScale]) => {
