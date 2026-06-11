@@ -45,8 +45,13 @@ def get_list_items():
 
 @app.route("/v1/list_items", methods=["POST"])
 def create_list_items():
+
+    authenticated = is_cookie_valid()
+    if not authenticated:
+        return jsonify({ "message": "You are not authenticated "}), 401
+
     data = request.get_json() 
-    # { item: 'apples' }
+    # { "item": "apples" }
 
     if not "item" in data:
         return jsonify({"error": "Item is required"}), 400
@@ -57,14 +62,18 @@ def create_list_items():
             "item": data["item"]
         })
         .select("*")
-        .eq("is_archived", False)
         .execute()
     )
 
     return jsonify(result.data)
 
 @app.route("/v1/list_items", methods=["PATCH"])
-def create_list_items():
+def update_list_items():
+
+    authenticated = is_cookie_valid()
+    if not authenticated:
+        return jsonify({ "message": "You are not authenticated "}), 401
+    
     data = request.get_json()
     # { id: 1, item: 'apples', is_checked: true, is_archived: true }
 
@@ -83,9 +92,9 @@ def create_list_items():
         update_fields["is_archived"] = data["is_archived"]
 
         if data["is_archived"] is True:
-            update_fields["archived_at"] = datetime.now(timezone.utc)
+            update_fields["archived_at"] = datetime.now(timezone.utc).isoformat()
 
-    update_fields["updated_at"] = datetime.now(timezone.utc)
+    update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
 
     if not update_fields:
         return jsonify({"error": "No fields to update"}), 400
