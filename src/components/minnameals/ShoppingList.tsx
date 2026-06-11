@@ -1,39 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import classNames from "classnames";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-} from "@mui/material";
-import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import EditIcon from "@mui/icons-material/Edit";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Divider, List, Typography } from "@mui/material";
 import { type ListItemApi } from "../../types/api/minnameals/listItems";
+import AddItem from "./AddItem";
+import ItemRow from "./ItemRow";
 
 type Props = {
   data: ListItemApi[];
 };
 
 export default function ShoppingList({ data }: Props) {
-  const [checked, setChecked] = useState([...data.filter((item) => item.is_checked).map((item) => item.id)]);
-
   const [uncheckedItems, checkedItems] = useMemo(() => {
     if (!data || !data.length) return [[], []];
     return data.reduce<[ListItemApi[], ListItemApi[]]>(
       (acc, item) => {
-        if (item.is_checked || checked.includes(item.id)) {
+        if (item.is_checked) {
           acc[1].push(item);
         } else {
           acc[0].push(item);
@@ -42,56 +24,15 @@ export default function ShoppingList({ data }: Props) {
       },
       [[], []],
     );
-  }, [checked, data]);
-
-  const handleToggle = (value: number) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-  };
+  }, [data]);
 
   const renderList = (items: ListItemApi[]) => {
     if (!items || !items.length) return null;
     return (
       <>
-        {items.map((listItem) => {
-          const isChecked = checked.includes(listItem.id);
-          return (
-            <ListItem disablePadding key={listItem.id}>
-              <ListItemButton role={undefined} onClick={handleToggle(listItem.id)} dense>
-                <ListItemIcon>
-                  <Checkbox
-                    checked={isChecked}
-                    icon={<CircleOutlinedIcon className="text-baedaGrey-50" />}
-                    checkedIcon={<CheckCircleIcon className="text-baedaOrange-200" />}
-                    disableRipple
-                    edge="start"
-                    slotProps={{ input: { "aria-labelledby": listItem.item } }}
-                    tabIndex={-1}
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  id={`shopping-list-item-${listItem.id}`}
-                  primary={listItem.item}
-                  className={classNames(isChecked ? "line-through text-baedaOrange-200" : "text-baedaGrey-50")}
-                />
-                <IconButton aira-label="edit" color="info">
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton aria-label="delete" color="error">
-                  <DeleteRoundedIcon fontSize="small" />
-                </IconButton>
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+        {items.map((listItem) => (
+          <ItemRow key={listItem.id} item={listItem} />
+        ))}
         <Divider />
       </>
     );
@@ -104,12 +45,7 @@ export default function ShoppingList({ data }: Props) {
       </Typography>
       {renderList(uncheckedItems)}
       {renderList(checkedItems)}
-      <ListItem disablePadding>
-        <Button className="w-full normal-case flex gap-2 justify-start text-baedaOrange-500" size="large">
-          <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaOrange-500" />
-          Add item
-        </Button>
-      </ListItem>
+      <AddItem />
     </List>
   );
 }

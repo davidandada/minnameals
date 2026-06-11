@@ -1,25 +1,18 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import appFetch from "./app/api/fetch";
+import { checkAuthentication } from "./src/app/api/password";
 
 export async function proxy(request: NextRequest) {
   const isPasswordPage = request.nextUrl.pathname.startsWith("/password");
 
   try {
-    const res = await appFetch('v1/auth');
-
-    if (!res.ok) {
-      const errorHtml = await res.text();
-      console.error(`[Middleware Flask Error] ${res.status}:`, errorHtml);
-
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) {
       if (!isPasswordPage) {
         return NextResponse.redirect(new URL("/password", request.url));
       }
       return NextResponse.next(); // Let them load the password page
     }
-
-    const data = await res.json();
-    const isAuthenticated = data.success;
 
     if (isAuthenticated && isPasswordPage) {
       return NextResponse.redirect(new URL("/", request.url));
@@ -29,7 +22,7 @@ export async function proxy(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error(`[Middleware Fetch Exception]:`, error);
+    console.error(`[Proxy Fetch Exception]:`, error);
     if (!isPasswordPage) {
       return NextResponse.redirect(new URL("/password", request.url));
     }

@@ -7,3 +7,7 @@ export type ListItemApi = {
   updated_at: string;
   archived_at: string | null;
 }
+
+export type NewItem = {
+  item: string;
+}
