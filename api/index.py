@@ -2,6 +2,8 @@ import os
 from flask import Flask, request, jsonify
 from supabase import create_client
 from datetime import datetime, timezone
+from helpers.auth import is_cookie_valid, is_user_authenticated
+from helpers.messages import UNAUTHENTICATED, ITEM_REQUIRED, NO_FIELD, ID_REQUIRED
 
 #------------------------------
 # SUPERBASE PUBLIC DEMO KEY
@@ -13,14 +15,6 @@ supabase = create_client(
 )
 
 app = Flask(__name__)
-
-def is_cookie_valid():
-    auth_password = os.getenv("APP_PASSWORD")
-    app_password = request.cookies.get('app_password')
-
-    success = auth_password == app_password
-
-    return success
 
 #------------------------------
 # ROUTES
@@ -37,24 +31,20 @@ def auth():
 
 @app.route("/v1/list_items", methods=["GET"])
 def get_list_items():
-    authenticated = is_cookie_valid()
-    if not authenticated:
-        return jsonify({ "message": "You are not authenticated "}), 401
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
     rows = supabase.schema("mealplan").table("list_items").select("*").eq("is_archived", False).order("id").execute()
     return jsonify(rows.data if hasattr(rows, "data") else rows)
 
 @app.route("/v1/list_items", methods=["POST"])
 def create_list_items():
-
-    authenticated = is_cookie_valid()
-    if not authenticated:
-        return jsonify({ "message": "You are not authenticated "}), 401
-
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
     data = request.get_json() 
     # { "item": "apples" }
 
     if not "item" in data:
-        return jsonify({"error": "Item is required"}), 400
+        return jsonify(ITEM_REQUIRED), 400
 
     result = (
         supabase.schema("mealplan").table("list_items")
@@ -69,16 +59,13 @@ def create_list_items():
 
 @app.route("/v1/list_items", methods=["PATCH"])
 def update_list_items():
-
-    authenticated = is_cookie_valid()
-    if not authenticated:
-        return jsonify({ "message": "You are not authenticated "}), 401
-    
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
     data = request.get_json()
-    # { id: 1, item: 'apples', is_checked: true, is_archived: true }
+    # { "id": 1, "item": "apples", "is_checked": true, "is_archived": true }
 
     if not "id" in data:
-        return jsonify({"error": "ID is required"}), 400
+        return jsonify(ID_REQUIRED), 400
 
     update_fields = {}
 
@@ -94,10 +81,10 @@ def update_list_items():
         if data["is_archived"] is True:
             update_fields["archived_at"] = datetime.now(timezone.utc).isoformat()
 
-    update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
-
     if not update_fields:
-        return jsonify({"error": "No fields to update"}), 400
+        return jsonify(NO_FIELD), 400
+    
+    update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
 
     result = (
         supabase.schema("mealplan")
