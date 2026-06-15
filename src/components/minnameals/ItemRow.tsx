@@ -1,6 +1,15 @@
 import { useMemo, useState } from "react";
 import classNames from "classnames";
-import { ListItem, IconButton, ListItemButton, ListItemIcon, Checkbox, ListItemText, Input } from "@mui/material";
+import {
+  ListItem,
+  IconButton,
+  ListItemButton,
+  ListItemIcon,
+  Checkbox,
+  ListItemText,
+  Input,
+  TextField,
+} from "@mui/material";
 import { ListItemApi } from "../../types/api/minnameals/listItems";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import EditIcon from "@mui/icons-material/Edit";
@@ -41,15 +50,11 @@ export default function ItemRow({ item }: Props) {
   };
 
   const handleEditInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    console.log(updatedItemName, event.relatedTarget?.id, item.item);
     if (!updatedItemName) {
-      console.log("deleting");
       handleDeleted();
     } else if (event.relatedTarget?.id === "cancelIcon" || event.relatedTarget?.id === "editItemInput") {
-      console.log("skipping");
       setUpdatedItemName(item.item);
     } else if (item.item !== updatedItemName) {
-      console.log("updating");
       handleItemNameUpdated();
     }
     setIsItemInEdit(false);
@@ -89,14 +94,16 @@ export default function ItemRow({ item }: Props) {
           />
         </ListItemIcon>
         {isItemInEdit ? (
-          <Input
+          <TextField
             autoFocus
             color="baedaOrange"
             fullWidth
             id="editItemInput"
             onBlur={handleEditInputBlur}
             onChange={updateItemName}
+            size="small"
             value={updatedItemName}
+            variant="standard"
           />
         ) : (
           <ListItemText

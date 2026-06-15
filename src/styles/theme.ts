@@ -12,8 +12,16 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides extends Record<CustomColorName, true> { }
 }
-declare module '@mui/material/InputBase' {
-  interface InputBasePropsColorOverrides extends Record<CustomColorName, true> { }
+declare module '@mui/material/TextField' {
+  interface TextFieldPropsColorOverrides extends Record<CustomColorName, true> { }
+}
+
+declare module '@mui/material/CircularProgress' {
+  interface CircularProgressPropsColorOverrides extends Record<CustomColorName, true> { }
+}
+
+declare module '@mui/material/IconButton' {
+  interface IconButtonPropsColorOverrides extends Record<CustomColorName, true> { }
 }
 
 const customPaletteOptions = Object.entries(brandColours).reduce(

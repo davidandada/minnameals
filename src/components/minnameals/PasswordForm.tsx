@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconButton, TextField } from "@mui/material";
+import { CircularProgress, IconButton, TextField } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import { submitPasswordAction } from "../../app/api/password";
+import brandColours from "../../styles/colours";
 
 export default function PasswordForm() {
   const router = useRouter();
@@ -26,18 +27,33 @@ export default function PasswordForm() {
   return (
     <div className="mx-auto self-center flex gap-2">
       <TextField
+        className="text-neutral-800 dark:text-neutral-200"
+        color="baedaOrange"
         error={error}
         helperText={error ? "Incorrect password" : ""}
         id="password"
         label="Enter app password"
         onChange={(e) => setPassword(e.target.value)}
+        sx={{
+          "& .MuiInput-underline": {
+            "&:before": {
+              borderBottomColor: brandColours.baedaOrange[500],
+            },
+            "&:hover:not(.Mui-disabled, .Mui-error):before": {
+              borderBottomColor: brandColours.baedaOrange[500],
+            },
+
+            "&:after": {
+              borderBottomColor: brandColours.baedaOrange[500],
+            },
+          },
+        }}
         value={password}
         variant="standard"
-        className="text-neutral-800 dark:text-neutral-200"
       />
       <div className="flex items-end">
-        <IconButton aria-label="submit" onClick={handleLogin} disabled={isSubmitting}>
-          <LoginIcon />
+        <IconButton aria-label="submit" color="baedaOrange" onClick={handleLogin} disabled={isSubmitting}>
+          {isSubmitting ? <CircularProgress color="baedaOrange" size={24} /> : <LoginIcon />}
         </IconButton>
       </div>
     </div>

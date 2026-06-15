@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, Input, Snackbar } from "@mui/material";
+import { Alert, Button, Snackbar, TextField } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { createListItem } from "../../app/api/listItems";
 import Slide from "@mui/material/Slide";
@@ -23,11 +23,9 @@ export default function AddItem() {
         return await createListItem(inputValue);
       })
         .then((item) => {
-          console.log(item);
           setShowSuccessSnack(item.item);
         })
         .catch((error) => {
-          console.log({ error });
           setShowErrorSnack(error.message || "Error adding itemm");
         });
     }
@@ -37,30 +35,45 @@ export default function AddItem() {
     <>
       <Button
         className="w-full normal-case flex gap-2 justify-start text-baedaOrange-500"
-        size="large"
+        disableRipple
         onClick={toggleInputShowing}
+        size="large"
       >
         <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaOrange-500" />
         {inputShowing ? (
-          <Input autoFocus fullWidth color="baedaOrange" onKeyUp={handleSubmit} onBlur={toggleInputShowing} />
+          <TextField
+            autoFocus
+            color="baedaOrange"
+            fullWidth
+            onBlur={toggleInputShowing}
+            size="small"
+            slotProps={{ htmlInput: { onKeyUp: handleSubmit } }}
+            variant="standard"
+          />
         ) : (
           "Add item"
         )}
       </Button>
       <Snackbar
-        autoHideDuration={6000}
-        message={`${showSuccessSnack} added successfully`}
+        autoHideDuration={3000}
         onClose={() => setShowSuccessSnack(false)}
         open={!!showSuccessSnack}
         slots={{ transition: Slide }}
-      />
+      >
+        <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
+          {showSuccessSnack} added!
+        </Alert>
+      </Snackbar>
       <Snackbar
-        autoHideDuration={6000}
-        message={showErrorSnack}
+        autoHideDuration={3000}
         onClose={() => setShowErrorSnack(false)}
         open={!!showErrorSnack}
         slots={{ transition: Slide }}
-      />
+      >
+        <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
+          {showErrorSnack}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
