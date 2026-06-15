@@ -1,12 +1,13 @@
+import { Metadata } from "next";
 import Head from "next/head";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
-import theme from "../styles/theme";
-import "../styles/globals.css";
+import QueryProvider from "./QueryProvider";
 import Header from "../components/layouts/Header";
 import PageLayout from "../components/layouts/PageLayout";
-import { Metadata } from "next";
+import theme from "../styles/theme";
+import "../styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Baeda",
@@ -25,9 +26,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Header />
-            <PageLayout>{children}</PageLayout>
+            <QueryProvider>
+              <CssBaseline />
+              <Header />
+              <PageLayout>{children}</PageLayout>
+            </QueryProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

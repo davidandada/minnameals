@@ -1,14 +1,19 @@
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import ShoppingList from "../components/minnameals/ShoppingList";
 import { getListItems } from "./api/listItems";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const data = await getListItems();
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["items"],
+    queryFn: getListItems,
+  });
 
   return (
-    <main>
-      <ShoppingList data={data} />
-    </main>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ShoppingList />
+    </HydrationBoundary>
   );
 }

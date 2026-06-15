@@ -1,15 +1,8 @@
-import { useMemo, useState } from "react";
+"use client";
+
+import { useState } from "react";
 import classNames from "classnames";
-import {
-  ListItem,
-  IconButton,
-  ListItemButton,
-  ListItemIcon,
-  Checkbox,
-  ListItemText,
-  Input,
-  TextField,
-} from "@mui/material";
+import { ListItem, IconButton, ListItemButton, ListItemIcon, Checkbox, ListItemText, TextField } from "@mui/material";
 import { ListItemApi } from "../../types/api/minnameals/listItems";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import EditIcon from "@mui/icons-material/Edit";
@@ -17,6 +10,7 @@ import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { updateListItem } from "../../app/api/listItems";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   item: ListItemApi;
@@ -26,23 +20,61 @@ export default function ItemRow({ item }: Props) {
   const [isItemInEdit, setIsItemInEdit] = useState<boolean>(false);
   const [updatedItemName, setUpdatedItemName] = useState(item.item);
 
+  const queryClient = useQueryClient();
+
+  // Optimistic Update Mutation
+  const updateMutation = useMutation({
+    mutationFn: updateListItem,
+
+    // 1. Fire immediately when mutate is called
+    onMutate: async (updatedItemData) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: ["items"] });
+
+      // Snapshot the previous state in case we need to roll back
+      const previousItems = queryClient.getQueryData<ListItemApi[]>(["items"]);
+
+      // Optimistically update the cache with the new data
+      queryClient.setQueryData<ListItemApi[]>(["items"], (old) => {
+        if (!old) return [];
+        return old.map((oldItem) => (oldItem.id === updatedItemData.id ? { ...oldItem, ...updatedItemData } : oldItem));
+      });
+
+      // Return a context object with the snapshotted value
+      return { previousItems };
+    },
+
+    // 2. If the mutation fails, use the context to roll back the UI
+    onError: (err, updatedItemData, context) => {
+      if (context?.previousItems) {
+        queryClient.setQueryData(["items"], context.previousItems);
+      }
+    },
+
+    // 3. Always refetch after error or success to ensure absolute synchronization
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+    },
+  });
+
   const handleToggle = () => {
     if (isItemInEdit) return;
-    Promise.try(() => updateListItem({ ...item, is_checked: !item.is_checked }));
+    updateMutation.mutate({ ...item, is_checked: !item.is_checked });
   };
 
   const handleDeleted = () => {
-    Promise.try(() => updateListItem({ ...item, is_archived: true }));
+    updateMutation.mutate({ ...item, is_archived: true });
   };
 
   const handleItemNameUpdated = () => {
-    Promise.try(() => updateListItem({ ...item, item: updatedItemName })).then(() => {
-      item.item = updatedItemName;
-    });
+    updateMutation.mutate({ ...item, item: updatedItemName });
   };
 
   const toggleEditForItem = () => {
-    setIsItemInEdit((prev) => !prev);
+    setIsItemInEdit((prev) => {
+      if (!prev) setUpdatedItemName(item.item);
+      return !prev;
+    });
   };
 
   const updateItemName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +82,7 @@ export default function ItemRow({ item }: Props) {
   };
 
   const handleEditInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    if (!updatedItemName) {
+    if (!updatedItemName.trim()) {
       handleDeleted();
     } else if (event.relatedTarget?.id === "cancelIcon" || event.relatedTarget?.id === "editItemInput") {
       setUpdatedItemName(item.item);
@@ -61,6 +93,7 @@ export default function ItemRow({ item }: Props) {
   };
 
   const isChecked = item.is_checked;
+
   return (
     <ListItem
       disablePadding
@@ -68,7 +101,7 @@ export default function ItemRow({ item }: Props) {
       secondaryAction={
         <>
           <IconButton
-            aira-label="edit"
+            aria-label="edit"
             color={isItemInEdit ? "warning" : "info"}
             id="cancelIcon"
             onClick={toggleEditForItem}
@@ -89,7 +122,7 @@ export default function ItemRow({ item }: Props) {
             disableRipple
             edge="start"
             icon={<CircleOutlinedIcon className="text-baedaGrey-50" />}
-            slotProps={{ input: { "aria-labelledby": item.item } }}
+            slotProps={{ input: { "aria-labelledby": `shopping-list-item-${item.id}` } }}
             tabIndex={-1}
           />
         </ListItemIcon>

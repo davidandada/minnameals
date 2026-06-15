@@ -101,6 +101,7 @@
 :root {
   --header-height: 70px;
   --content-min-height: calc(100svh - var(--header-height));
+  --content-top-padding: calc(var(--header-height) + 4rem);
 }
 
 body {

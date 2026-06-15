@@ -6,12 +6,17 @@ export async function proxy(request: NextRequest) {
   const isPasswordPage = request.nextUrl.pathname.startsWith("/password");
 
   try {
-    const isAuthenticated = await checkAuthentication();
+    // Extract the raw cookie string from the incoming proxy request
+    const cookieHeader = request.headers.get('cookie') || undefined;
+
+    // Pass the cookie down to the auth function
+    const isAuthenticated = await checkAuthentication(cookieHeader);
+
     if (!isAuthenticated) {
       if (!isPasswordPage) {
         return NextResponse.redirect(new URL("/password", request.url));
       }
-      return NextResponse.next(); // Let them load the password page
+      return NextResponse.next();
     }
 
     if (isAuthenticated && isPasswordPage) {

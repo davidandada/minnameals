@@ -1,16 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Divider, List, Typography } from "@mui/material";
 import { type ListItemApi } from "../../types/api/minnameals/listItems";
 import AddItem from "./AddItem";
 import ItemRow from "./ItemRow";
+import { useQuery } from "@tanstack/react-query";
+import { getListItems } from "../../app/api/listItems";
 
-type Props = {
-  data: ListItemApi[];
-};
+export default function ShoppingList() {
+  const { data } = useQuery({
+    queryKey: ["items"],
+    queryFn: getListItems,
+  });
 
-export default function ShoppingList({ data }: Props) {
   const [uncheckedItems, checkedItems] = useMemo(() => {
     if (!data || !data.length) return [[], []];
     return data.reduce<[ListItemApi[], ListItemApi[]]>(
@@ -39,13 +42,15 @@ export default function ShoppingList({ data }: Props) {
   };
 
   return (
-    <List className="max-w-130.5 mx-auto h-6 flex flex-col gap-2">
+    <section className="max-w-130.5 mx-auto">
       <Typography variant="h4" component="h2" className="mb-6 text-baedaOrange-500">
         Shopping list
       </Typography>
-      {renderList(uncheckedItems)}
-      {renderList(checkedItems)}
-      <AddItem />
-    </List>
+      <List className="flex flex-col gap-2">
+        {renderList(uncheckedItems)}
+        {renderList(checkedItems)}
+        <AddItem />
+      </List>
+    </section>
   );
 }

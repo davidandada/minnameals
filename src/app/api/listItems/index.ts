@@ -1,19 +1,40 @@
 "use server";
 
+import { cookies } from "next/headers";
 import appFetch from "../fetch";
-import { ListItemApi, NewItem } from "../../../types/api/minnameals/listItems";
+import { ListItemApi } from "../../../types/api/minnameals/listItems";
+
+// Helper to extract the cookie string on the server
+async function getAuthCookie() {
+  const cookieStore = await cookies();
+  return cookieStore.toString();
+}
 
 export async function getListItems() {
-  const data = await appFetch("v1/list_items");
+  const cookieHeader = await getAuthCookie();
+
+  const data = await appFetch<ListItemApi[]>("v1/list_items", { method: 'GET' }, cookieHeader);
   return data;
 }
 
 export async function createListItem(itemName: string) {
-  const data = await appFetch("v1/list_items", { method: "POST", body: { item: itemName } });
+  const cookieHeader = await getAuthCookie();
+
+  const data = await appFetch<ListItemApi[]>("v1/list_items", {
+    method: "POST",
+    body: { item: itemName }
+  }, cookieHeader);
+
   return data[0];
 }
 
 export async function updateListItem(item: ListItemApi) {
-  const updatedItem = await appFetch("v1/list_items", { method: "PATCH", body: item })
+  const cookieHeader = await getAuthCookie();
+
+  const updatedItem = await appFetch<ListItemApi[]>("v1/list_items", {
+    method: "PATCH",
+    body: item
+  }, cookieHeader);
+
   return updatedItem[0];
 }
