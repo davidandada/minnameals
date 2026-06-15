@@ -9,8 +9,8 @@ export async function getListItems() {
 }
 
 export async function createListItem(itemName: string) {
-  const newItem = await appFetch("v1/list_items", { method: "POST", body: { item: itemName } });
-  return newItem[0];
+  const data = await appFetch("v1/list_items", { method: "POST", body: { item: itemName } });
+  return data[0];
 }
 
 export async function updateListItem(item: ListItemApi) {

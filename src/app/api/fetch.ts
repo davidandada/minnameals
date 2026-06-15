@@ -1,5 +1,10 @@
+'use server';
+
+import { redirect } from "next/navigation";
 import { cookies, headers } from "next/headers";
 import { DEFAULT_ERROR_MESSAGE } from "./utils";
+import { PASSWORD_ROUTE } from "../../types/constants";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 type FetchOptions =
   | { method: 'GET' }
@@ -25,11 +30,25 @@ export default async function appFetch(path: string, options: FetchOptions = { m
     ...(isPostOrPatch && { body: JSON.stringify(options.body) })
   };
 
-  const res = await fetch(`${baseUrl}/api/${path}`, fetchConfig);
-  const body = await res.json();
-  if (!res.ok) {
-    console.error(`Flask API Error: ${res.status} ${res.statusText}`);
-    throw new Error(body.message || DEFAULT_ERROR_MESSAGE)
-  }
-  return body;
+  return await Promise.try(async () => {
+    const res = await fetch(`${baseUrl}/api/${path}`, fetchConfig)
+    const body = await res.json();
+    console.log(res)
+    if (!res.ok) {
+      console.error(`Flask API Error: ${res.status} ${res.statusText}`);
+      if (res.status === 401) {
+        return redirect(PASSWORD_ROUTE)
+      }
+      if (res.status === 500) {
+        throw new Error(DEFAULT_ERROR_MESSAGE)
+      }
+      throw new Error(body.message || DEFAULT_ERROR_MESSAGE)
+    }
+    return body;
+  }).catch(error => {
+    if (isRedirectError(error)) {
+      throw error
+    }
+    throw new Error(error.message)
+  }).then(body => body);
 }

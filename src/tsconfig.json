@@ -30,7 +30,7 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx",
-    "../proxy.ts"
+    "proxy.ts"
   ],
   "exclude": ["node_modules"]
 }

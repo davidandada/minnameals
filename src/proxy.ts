@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { checkAuthentication } from "./src/app/api/password";
+import { checkAuthentication } from "./app/api/password";
 
 export async function proxy(request: NextRequest) {
   const isPasswordPage = request.nextUrl.pathname.startsWith("/password");
