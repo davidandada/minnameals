@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Alert, Button, Snackbar, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Snackbar, TextField, Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { createListItem } from "@/api/listItems";
 import Slide from "@mui/material/Slide";
@@ -86,7 +86,7 @@ export default function AddItem() {
       >
         <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
         {inputShowing ? (
-          <form onSubmit={handleSubmit}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
             <TextField
               autoFocus
               color="baedaPink"
@@ -94,11 +94,10 @@ export default function AddItem() {
               onBlur={handleBlur}
               onChange={(e) => setItemName(e.target.value)}
               size="small"
-              type="submit"
               value={itemName}
               variant="standard"
             />
-          </form>
+          </Box>
         ) : (
           <Typography variant="body2">Add item</Typography>
         )}
