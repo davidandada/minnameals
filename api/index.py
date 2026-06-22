@@ -49,7 +49,8 @@ def create_list_items():
     result = (
         supabase.schema("mealplan").table("list_items")
         .insert({
-            "item": data["item"]
+            "item": data["item"],
+            "position": data["position"]
         })
         .select("*")
         .execute()
@@ -71,6 +72,9 @@ def update_list_items():
 
     if "item" in data:
         update_fields["item"] = data["item"]
+
+    if "position" in data:
+        update_fields["position"] = data["position"]
 
     if "is_checked" in data:
         update_fields["is_checked"] = data["is_checked"]
