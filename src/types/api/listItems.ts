@@ -1,11 +1,12 @@
 export type ListItemApi = {
-  id: number;
-  item: string;
-  is_checked: boolean;
-  is_archived: boolean;
-  created_at: string;
-  updated_at: string;
   archived_at: string | null;
+  created_at: string;
+  id: number;
+  is_archived: boolean;
+  is_checked: boolean;
+  item: string;
+  position: string;
+  updated_at: string;
 }
 
 export type NewItem = {

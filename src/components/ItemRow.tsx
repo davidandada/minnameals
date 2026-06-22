@@ -10,7 +10,7 @@ import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { updateListItem } from "@/api/listItems";
-import { type ListItemApi } from "@/types/api/minnameals/listItems";
+import { type ListItemApi } from "@/types/api/listItems";
 
 type Props = {
   item: ListItemApi;
@@ -22,36 +22,28 @@ export default function ItemRow({ item }: Props) {
 
   const queryClient = useQueryClient();
 
-  // Optimistic Update Mutation
   const updateMutation = useMutation({
     mutationFn: updateListItem,
 
-    // 1. Fire immediately when mutate is called
     onMutate: async (updatedItemData) => {
-      // Cancel any outgoing refetches so they don't overwrite our optimistic update
       await queryClient.cancelQueries({ queryKey: ["items"] });
 
-      // Snapshot the previous state in case we need to roll back
       const previousItems = queryClient.getQueryData<ListItemApi[]>(["items"]);
 
-      // Optimistically update the cache with the new data
       queryClient.setQueryData<ListItemApi[]>(["items"], (old) => {
         if (!old) return [];
         return old.map((oldItem) => (oldItem.id === updatedItemData.id ? { ...oldItem, ...updatedItemData } : oldItem));
       });
 
-      // Return a context object with the snapshotted value
       return { previousItems };
     },
 
-    // 2. If the mutation fails, use the context to roll back the UI
     onError: (err, updatedItemData, context) => {
       if (context?.previousItems) {
         queryClient.setQueryData(["items"], context.previousItems);
       }
     },
 
-    // 3. Always refetch after error or success to ensure absolute synchronization
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
     },

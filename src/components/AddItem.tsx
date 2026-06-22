@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { Alert, Button, Snackbar, TextField } from "@mui/material";
+import { useState } from "react";
+import { Alert, Button, Snackbar, TextField, Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { createListItem } from "@/api/listItems";
 import Slide from "@mui/material/Slide";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ListItemApi } from "@/types/api/minnameals/listItems";
+import { ListItemApi } from "@/types/api/listItems";
 
 export default function AddItem() {
   const [inputShowing, setInputShowing] = useState<boolean>(false);
@@ -33,6 +33,7 @@ export default function AddItem() {
         created_at: "",
         updated_at: "",
         archived_at: null,
+        position: "",
       };
 
       queryClient.setQueryData<ListItemApi[]>(["items"], (old) => {
@@ -67,38 +68,39 @@ export default function AddItem() {
     setItemName("");
   };
 
-  const handleSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (!itemName.trim()) return;
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      createMutation.mutate(itemName);
-      setItemName("");
-    }
+    if (!itemName.trim()) return;
+    createMutation.mutate(itemName);
+    setItemName("");
   };
 
   return (
     <>
       <Button
-        className="w-full normal-case flex gap-2 justify-start text-baedaOrange-500"
+        className="w-full normal-case flex gap-2 justify-start text-baedaGrey-50"
         disableRipple
         onClick={!inputShowing ? toggleInputShowing : undefined}
         size="large"
       >
-        <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaOrange-500" />
+        <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
         {inputShowing ? (
-          <TextField
-            autoFocus
-            color="baedaOrange"
-            fullWidth
-            size="small"
-            variant="standard"
-            value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
-            onBlur={handleBlur} // <--- Hides the input when clicking away
-            slotProps={{ htmlInput: { onKeyUp: handleSubmit } }}
-          />
+          <form onSubmit={handleSubmit}>
+            <TextField
+              autoFocus
+              color="baedaPink"
+              fullWidth
+              onBlur={handleBlur}
+              onChange={(e) => setItemName(e.target.value)}
+              size="small"
+              type="submit"
+              value={itemName}
+              variant="standard"
+            />
+          </form>
         ) : (
-          "Add item"
+          <Typography variant="body2">Add item</Typography>
         )}
       </Button>
 
