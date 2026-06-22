@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Head from "next/head";
+import { Analytics } from "@vercel/analytics/next";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
@@ -30,6 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <CssBaseline />
               <Header />
               <PageLayout>{children}</PageLayout>
+              <Analytics />
             </QueryProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
