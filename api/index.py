@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from supabase import create_client
 from datetime import datetime, timezone
 from helpers.auth import is_cookie_valid, is_user_authenticated
-from helpers.messages import UNAUTHENTICATED, ITEM_REQUIRED, NO_FIELD, ID_REQUIRED
+from helpers.messages import UNAUTHENTICATED, ITEM_REQUIRED, NO_FIELD, ID_REQUIRED, POSITION_REQUIRED
 from fractional_indexing import generate_key_between
 
 
@@ -48,23 +48,14 @@ def create_list_items():
     if not "item" in data:
         return jsonify(ITEM_REQUIRED), 400
     
-    last_item = (
-        supabase.schema("mealplan")
-        .table("list_items")
-        .select("position")
-        .order("position", desc=True)
-        .limit(1)
-        .execute()
-    )
-
-    last_position = last_item.data[0]["position"] if last_item.data else None
-    new_position = generate_key_between(last_position, None)
-
+    if not "position" in data:
+        return jsonify(POSITION_REQUIRED), 400
+ 
     result = (
         supabase.schema("mealplan").table("list_items")
         .insert({
             "item": data["item"],
-            "position": new_position
+            "position": data["position"]
         })
         .select("*")
         .execute()
@@ -87,17 +78,18 @@ def update_list_items():
     if "item" in data:
         update_fields["item"] = data["item"]
 
-    if "position" in data:
-        update_fields["position"] = data["position"]
-
     if "is_checked" in data:
         update_fields["is_checked"] = data["is_checked"]
+
+    if "position" in data:
+        update_fields["position"] = data["position"]
 
     if "is_archived" in data:
         update_fields["is_archived"] = data["is_archived"]
 
         if data["is_archived"] is True:
             update_fields["archived_at"] = datetime.now(timezone.utc).isoformat()
+            update_fields["position"] = None
 
     if not update_fields:
         return jsonify(NO_FIELD), 400
