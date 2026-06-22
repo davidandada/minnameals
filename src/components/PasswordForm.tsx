@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CircularProgress, IconButton, TextField } from "@mui/material";
+import { Box, CircularProgress, IconButton, TextField } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import { submitPasswordAction } from "@/api/password";
 import brandColours from "@/styles/colours";
@@ -13,7 +13,8 @@ export default function PasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setIsSubmitting(true);
     setError(false);
 
@@ -25,7 +26,7 @@ export default function PasswordForm() {
   };
 
   return (
-    <div className="mx-auto self-center flex gap-2">
+    <Box component="form" onSubmit={handleLogin} className="mx-auto self-center flex gap-2">
       <TextField
         className="text-neutral-800 dark:text-neutral-200"
         color="baedaOrange"
@@ -56,6 +57,6 @@ export default function PasswordForm() {
           {isSubmitting ? <CircularProgress color="baedaOrange" size={24} /> : <LoginIcon />}
         </IconButton>
       </div>
-    </div>
+    </Box>
   );
 }
