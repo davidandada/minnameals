@@ -4,6 +4,8 @@ from supabase import create_client
 from datetime import datetime, timezone
 from helpers.auth import is_cookie_valid, is_user_authenticated
 from helpers.messages import UNAUTHENTICATED, ITEM_REQUIRED, NO_FIELD, ID_REQUIRED
+from fractional_indexing import generate_key_between
+
 
 #------------------------------
 # SUPERBASE PUBLIC DEMO KEY
@@ -45,12 +47,24 @@ def create_list_items():
 
     if not "item" in data:
         return jsonify(ITEM_REQUIRED), 400
+    
+    last_item = (
+        supabase.schema("mealplan")
+        .table("list_items")
+        .select("position")
+        .order("position", desc=True)
+        .limit(1)
+        .execute()
+    )
+
+    last_position = last_item.data[0]["position"] if last_item.data else None
+    new_position = generate_key_between(last_position, None)
 
     result = (
         supabase.schema("mealplan").table("list_items")
         .insert({
             "item": data["item"],
-            "position": data["position"]
+            "position": new_position
         })
         .select("*")
         .execute()
