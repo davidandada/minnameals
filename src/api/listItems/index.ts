@@ -1,8 +1,8 @@
 "use server";
 
 import { cookies } from "next/headers";
-import appFetch from "../fetch";
-import { ListItemApi } from "../../../types/api/minnameals/listItems";
+import appFetch from "@/api/fetch";
+import { ListItemApi } from "@/types/api/minnameals/listItems";
 
 // Helper to extract the cookie string on the server
 async function getAuthCookie() {

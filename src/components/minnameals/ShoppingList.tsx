@@ -1,18 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
-import { Divider, List, Typography } from "@mui/material";
-import { type ListItemApi } from "../../types/api/minnameals/listItems";
-import AddItem from "./AddItem";
-import ItemRow from "./ItemRow";
 import { useQuery } from "@tanstack/react-query";
-import { getListItems } from "../../app/api/listItems";
+import { Divider, List, Typography } from "@mui/material";
+import { getListItems } from "@/api/listItems";
+import AddItem from "@/components/minnameals/AddItem";
+import ItemRow from "@/components/minnameals/ItemRow";
+import { type ListItemApi } from "@/types/api/minnameals/listItems";
 
 export default function ShoppingList() {
   const { data } = useQuery({
     queryKey: ["items"],
     queryFn: getListItems,
-    refetchInterval: 3000,
+    refetchInterval: () => (process.env.NODE_ENV === "development" ? false : 3000),
   });
 
   const [uncheckedItems, checkedItems] = useMemo(() => {

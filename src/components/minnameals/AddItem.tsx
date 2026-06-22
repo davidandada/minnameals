@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { Alert, Button, Snackbar, TextField } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { createListItem } from "../../app/api/listItems";
+import { createListItem } from "@/api/listItems";
 import Slide from "@mui/material/Slide";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ListItemApi } from "../../types/api/minnameals/listItems";
+import { ListItemApi } from "@/types/api/minnameals/listItems";
 
 export default function AddItem() {
   const [inputShowing, setInputShowing] = useState<boolean>(false);

@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import classNames from "classnames";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ListItem, IconButton, ListItemButton, ListItemIcon, Checkbox, ListItemText, TextField } from "@mui/material";
-import { ListItemApi } from "../../types/api/minnameals/listItems";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import EditIcon from "@mui/icons-material/Edit";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { updateListItem } from "../../app/api/listItems";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateListItem } from "@/api/listItems";
+import { type ListItemApi } from "@/types/api/minnameals/listItems";
 
 type Props = {
   item: ListItemApi;

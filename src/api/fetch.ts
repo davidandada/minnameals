@@ -1,5 +1,5 @@
 import { DEFAULT_ERROR_MESSAGE, UNAUTHORISED } from "./utils";
-import { PASSWORD_ROUTE } from "../../types/constants";
+import { PASSWORD_ROUTE } from "@/types/constants";
 
 type FetchOptions =
   | { method: 'GET' }

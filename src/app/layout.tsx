@@ -6,10 +6,10 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import QueryProvider from "./QueryProvider";
-import Header from "../components/layouts/Header";
-import PageLayout from "../components/layouts/PageLayout";
-import theme from "../styles/theme";
-import "../styles/globals.css";
+import Header from "@/components/layouts/Header";
+import PageLayout from "@/components/layouts/PageLayout";
+import theme from "@/styles/theme";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Baeda",

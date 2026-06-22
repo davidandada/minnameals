@@ -1,4 +1,4 @@
-import PasswordForm from "../../components/minnameals/PasswordForm";
+import PasswordForm from "@/components/minnameals/PasswordForm";
 
 export default async function Password() {
   return (

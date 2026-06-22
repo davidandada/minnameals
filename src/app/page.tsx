@@ -1,6 +1,6 @@
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import ShoppingList from "../components/minnameals/ShoppingList";
-import { getListItems } from "./api/listItems";
+import ShoppingList from "@/components/minnameals/ShoppingList";
+import { getListItems } from "@/api/listItems";
 
 export const dynamic = "force-dynamic";
 
