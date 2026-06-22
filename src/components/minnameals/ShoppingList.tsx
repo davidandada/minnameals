@@ -12,6 +12,7 @@ export default function ShoppingList() {
   const { data } = useQuery({
     queryKey: ["items"],
     queryFn: getListItems,
+    refetchInterval: 3000,
   });
 
   const [uncheckedItems, checkedItems] = useMemo(() => {
