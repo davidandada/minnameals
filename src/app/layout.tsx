@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const isDev = process.env.NODE_ENV === "development";
   return (
     <html lang="en">
       <Head>
@@ -32,8 +33,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <CssBaseline />
               <Header />
               <PageLayout>{children}</PageLayout>
-              <Analytics />
-              <SpeedInsights />
+              {!isDev && (
+                <>
+                  <Analytics />
+                  <SpeedInsights />
+                </>
+              )}
             </QueryProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>

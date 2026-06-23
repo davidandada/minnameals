@@ -1,9 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import classNames from "classnames";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ListItem, IconButton, ListItemButton, ListItemIcon, Checkbox, ListItemText, TextField } from "@mui/material";
+import { useSortable } from "@dnd-kit/react/sortable";
+import {
+  Box,
+  Checkbox,
+  CircularProgress,
+  IconButton,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  TextField,
+} from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import EditIcon from "@mui/icons-material/Edit";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
@@ -14,11 +27,18 @@ import { type ListItemApi } from "@/types/api/listItems";
 
 type Props = {
   item: ListItemApi;
+  index: number;
 };
 
-export default function ItemRow({ item }: Props) {
+export default function ItemRow({ item, index }: Props) {
   const [isItemInEdit, setIsItemInEdit] = useState<boolean>(false);
   const [updatedItemName, setUpdatedItemName] = useState(item.item);
+  const { ref } = useSortable({
+    id: item.id,
+    index,
+    data: item,
+    disabled: item.is_checked,
+  });
 
   const queryClient = useQueryClient();
 
@@ -46,6 +66,9 @@ export default function ItemRow({ item }: Props) {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
+      setTimeout(() => {
+        updateMutation.reset();
+      }, 1000);
     },
   });
 
@@ -73,10 +96,17 @@ export default function ItemRow({ item }: Props) {
     setUpdatedItemName(e.currentTarget.value);
   };
 
-  const handleEditInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+  const handleUpdateItemName = (
+    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement> | React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
     if (!updatedItemName.trim()) {
       handleDeleted();
-    } else if (event.relatedTarget?.id === "cancelIcon" || event.relatedTarget?.id === "editItemInput") {
+    } else if (
+      "relatedTarget" in event &&
+      ((event.relatedTarget as Element)?.id === "cancelIcon" ||
+        (event.relatedTarget as Element)?.id === "editItemInput")
+    ) {
       setUpdatedItemName(item.item);
     } else if (item.item !== updatedItemName) {
       handleItemNameUpdated();
@@ -86,11 +116,17 @@ export default function ItemRow({ item }: Props) {
 
   const isChecked = item.is_checked;
 
-  return (
-    <ListItem
-      disablePadding
-      key={item.id}
-      secondaryAction={
+  const renderSecondaryAction = () => {
+    if (updateMutation.isPending)
+      return (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <CircularProgress color="baedaRed" size={18} />
+        </Box>
+      );
+    if (updateMutation.isSuccess) return <CheckIcon color="baedaGreen" />;
+    if (updateMutation.isError) return <ClearIcon color="baedaRed" />;
+    else
+      return (
         <>
           <IconButton
             aria-label="edit"
@@ -104,8 +140,11 @@ export default function ItemRow({ item }: Props) {
             <DeleteRoundedIcon fontSize="small" />
           </IconButton>
         </>
-      }
-    >
+      );
+  };
+
+  return (
+    <ListItem disablePadding key={item.id} ref={ref} secondaryAction={renderSecondaryAction()}>
       <ListItemButton role={undefined} onClick={handleToggle} dense>
         <ListItemIcon>
           <Checkbox
@@ -119,17 +158,19 @@ export default function ItemRow({ item }: Props) {
           />
         </ListItemIcon>
         {isItemInEdit ? (
-          <TextField
-            autoFocus
-            color="baedaOrange"
-            fullWidth
-            id="editItemInput"
-            onBlur={handleEditInputBlur}
-            onChange={updateItemName}
-            size="small"
-            value={updatedItemName}
-            variant="standard"
-          />
+          <Box component="form" onSubmit={handleUpdateItemName} sx={{ width: "80%" }}>
+            <TextField
+              autoFocus
+              color="baedaOrange"
+              fullWidth
+              id="editItemInput"
+              onBlur={handleUpdateItemName}
+              onChange={updateItemName}
+              size="small"
+              value={updatedItemName}
+              variant="standard"
+            />
+          </Box>
         ) : (
           <ListItemText
             className={classNames(isChecked ? "line-through text-baedaOrange-200" : "text-baedaGrey-50")}

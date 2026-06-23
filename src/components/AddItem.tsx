@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { generateKeyBetween } from "fractional-indexing";
 import { Alert, Box, Button, Snackbar, TextField, Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { createListItem } from "@/api/listItems";
@@ -20,20 +21,20 @@ export default function AddItem() {
   const createMutation = useMutation({
     mutationFn: createListItem,
 
-    onMutate: async (newItemName) => {
+    onMutate: async ({ itemName, position }) => {
       await queryClient.cancelQueries({ queryKey: ["items"] });
 
       const previousItems = queryClient.getQueryData<ListItemApi[]>(["items"]);
 
       const optimisticItem: ListItemApi = {
         id: Date.now(),
-        item: newItemName,
+        item: itemName,
         is_checked: false,
         is_archived: false,
         created_at: "",
         updated_at: "",
         archived_at: null,
-        position: "",
+        position: position,
       };
 
       queryClient.setQueryData<ListItemApi[]>(["items"], (old) => {
@@ -72,7 +73,17 @@ export default function AddItem() {
     e.preventDefault();
 
     if (!itemName.trim()) return;
-    createMutation.mutate(itemName);
+
+    const cachedData = queryClient.getQueryData<ListItemApi[]>(["items"]) ?? [];
+    const positionSortedData = [...cachedData].sort((a, b) => a.position.localeCompare(b.position));
+    console.log({ positionSortedData });
+    const lastItem = positionSortedData[positionSortedData.length - 1];
+    const lastPosition = lastItem ? lastItem.position : null;
+
+    createMutation.mutate({
+      itemName: itemName,
+      position: generateKeyBetween(lastPosition, null),
+    });
     setItemName("");
   };
 

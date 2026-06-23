@@ -5,7 +5,7 @@ export default function useSortShoppingListItems(items: ListItemApi[]) {
   const [checked, unchecked] = separateByChecked(items);
   const sortedCheckedItems = [...checked].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
   const sortedUncheckedItems = [...unchecked].sort((a, b) =>
-    a.position.localeCompare(b.position, undefined, { numeric: true }),
+    a.position.localeCompare(b.position),
   );
 
   return [sortedCheckedItems, sortedUncheckedItems];

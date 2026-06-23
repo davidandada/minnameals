@@ -24,6 +24,10 @@ declare module '@mui/material/IconButton' {
   interface IconButtonPropsColorOverrides extends Record<CustomColorName, true> { }
 }
 
+declare module '@mui/material/SvgIcon' {
+  interface SvgIconPropsColorOverrides extends Record<CustomColorName, true> { }
+}
+
 const customPaletteOptions = Object.entries(brandColours).reduce(
   (acc, [colorName, colorScale]) => {
     acc[colorName as CustomColorName] = {
