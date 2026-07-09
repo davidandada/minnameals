@@ -2,20 +2,18 @@
 
 import { useState } from "react";
 import { generateKeyBetween } from "fractional-indexing";
-import { Alert, Box, Button, Snackbar, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { createListItem } from "@/api/listItems";
-import Slide from "@mui/material/Slide";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNotification } from "@/components/NotificationProvider";
 import { ListItemApi } from "@/types/api/listItems";
 
 export default function AddItem() {
   const [inputShowing, setInputShowing] = useState<boolean>(false);
   const [itemName, setItemName] = useState<string>("");
 
-  const [showSuccessSnack, setShowSuccessSnack] = useState<boolean | string>(false);
-  const [showErrorSnack, setShowErrorSnack] = useState<boolean | string>(false);
-
+  const { showSuccess, showError } = useNotification();
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
@@ -48,11 +46,11 @@ export default function AddItem() {
       if (context?.previousItems) {
         queryClient.setQueryData(["items"], context.previousItems);
       }
-      setShowErrorSnack(err.message || "Error adding item");
+      showError(err.message || "Error adding item");
     },
 
     onSuccess: (serverItem) => {
-      setShowSuccessSnack(serverItem.item);
+      showSuccess(`${serverItem.item} added!`);
     },
 
     onSettled: () => {
@@ -76,7 +74,6 @@ export default function AddItem() {
 
     const cachedData = queryClient.getQueryData<ListItemApi[]>(["items"]) ?? [];
     const positionSortedData = [...cachedData].sort((a, b) => a.position.localeCompare(b.position));
-    console.log({ positionSortedData });
     const lastItem = positionSortedData[positionSortedData.length - 1];
     const lastPosition = lastItem ? lastItem.position : null;
 
@@ -87,54 +84,50 @@ export default function AddItem() {
     setItemName("");
   };
 
-  return (
-    <>
-      <Button
-        className="w-full normal-case flex gap-2 justify-start text-baedaGrey-50"
-        disableRipple
-        onClick={!inputShowing ? toggleInputShowing : undefined}
-        size="large"
-      >
-        <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
-        {inputShowing ? (
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-            <TextField
-              autoFocus
-              color="baedaPink"
-              fullWidth
-              onBlur={handleBlur}
-              onChange={(e) => setItemName(e.target.value)}
-              size="small"
-              value={itemName}
-              variant="standard"
-            />
-          </Box>
-        ) : (
-          <Typography variant="body2">Add item</Typography>
-        )}
-      </Button>
-
-      <Snackbar
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessSnack(false)}
-        open={!!showSuccessSnack}
-        slots={{ transition: Slide }}
-      >
-        <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
-          {showSuccessSnack} added!
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        autoHideDuration={3000}
-        onClose={() => setShowErrorSnack(false)}
-        open={!!showErrorSnack}
-        slots={{ transition: Slide }}
-      >
-        <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
-          {showErrorSnack}
-        </Alert>
-      </Snackbar>
-    </>
+  return inputShowing ? (
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      className="w-full flex gap-2 justify-start items-center text-baedaGrey-50 px-[22px] py-[8px]"
+    >
+      <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
+      <TextField
+        autoFocus
+        color="baedaPink"
+        fullWidth
+        multiline
+        onBlur={handleBlur}
+        onChange={(e) => setItemName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            handleBlur();
+          }
+        }}
+        size="small"
+        value={itemName}
+        variant="standard"
+        slotProps={{
+          input: {
+            sx: {
+              typography: "body2",
+            },
+          },
+        }}
+      />
+    </Box>
+  ) : (
+    <Button
+      className="w-full normal-case flex gap-2 justify-start text-baedaGrey-50"
+      disableRipple
+      onClick={toggleInputShowing}
+      size="large"
+    >
+      <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
+      <Typography variant="body2">Add item</Typography>
+    </Button>
   );
 }
