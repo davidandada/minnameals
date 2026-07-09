@@ -38,7 +38,7 @@ def get_item():
     return jsonify(rows.data if hasattr(rows, "data") else rows)
 
 @app.route("/v1/category", methods=["GET"])
-def get_item():
+def get_category():
     if not is_user_authenticated():
         return jsonify(UNAUTHENTICATED), 401
     rows = supabase.schema("mealplan").table("category").select("*").eq("is_archived", False).order("id").execute()
