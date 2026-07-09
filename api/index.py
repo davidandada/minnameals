@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from supabase import create_client
 from datetime import datetime, timezone
 from helpers.auth import is_cookie_valid, is_user_authenticated
-from helpers.messages import UNAUTHENTICATED, ITEM_REQUIRED, NO_FIELD, ID_REQUIRED, POSITION_REQUIRED, NAME_REQUIRED
+from helpers.messages import UNAUTHENTICATED, ITEM_REQUIRED, NO_FIELD, ID_REQUIRED, POSITION_REQUIRED, NAME_REQUIRED, DATA_REQUIRED
 from fractional_indexing import generate_key_between
 
 #------------------------------
@@ -37,12 +37,22 @@ def get_item():
     rows = supabase.schema("mealplan").table("item").select("*, category(id, name)").eq("is_archived", False).order("position").execute()
     return jsonify(rows.data if hasattr(rows, "data") else rows)
 
+@app.route("/v1/category", methods=["GET"])
+def get_item():
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
+    rows = supabase.schema("mealplan").table("category").select("*").eq("is_archived", False).order("id").execute()
+    return jsonify(rows.data if hasattr(rows, "data") else rows)
+
 @app.route("/v1/item", methods=["POST"])
 def create_item():
     if not is_user_authenticated():
         return jsonify(UNAUTHENTICATED), 401
     data = request.get_json() 
     # { "item": "apples" }
+
+    if not data:
+        return jsonify(DATA_REQUIRED), 400
 
     if not "item" in data:
         return jsonify(ITEM_REQUIRED), 400
@@ -62,12 +72,38 @@ def create_item():
 
     return jsonify(result.data)
 
+@app.route("/v1/category", methods=["POST"])
+def create_category():
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
+    data = request.get_json()
+    # { "name": "Produce" }
+
+    if not data:
+        return jsonify(DATA_REQUIRED), 400
+
+    if not data.get("name"):
+        return jsonify(NAME_REQUIRED), 400
+
+    result = (
+        supabase.schema("mealplan").table("category")
+        .insert({
+            "name": data["name"]
+        })
+        .execute()
+    )
+
+    return jsonify(result.data)
+
 @app.route("/v1/item", methods=["PATCH"])
 def update_item():
     if not is_user_authenticated():
         return jsonify(UNAUTHENTICATED), 401
     data = request.get_json()
     # { "id": 1, "item": "apples", "is_checked": true, "is_archived": true }
+
+    if not data:
+        return jsonify(DATA_REQUIRED), 400
 
     if not "id" in data:
         return jsonify(ID_REQUIRED), 400
@@ -109,33 +145,15 @@ def update_item():
 
     return jsonify(result.data)
 
-
-@app.route("/v1/category", methods=["POST"])
-def create_category():
-    if not is_user_authenticated():
-        return jsonify(UNAUTHENTICATED), 401
-    data = request.get_json()
-    # { "name": "Produce" }
-
-    if not data.get("name"):
-        return jsonify(NAME_REQUIRED), 400
-
-    result = (
-        supabase.schema("mealplan").table("category")
-        .insert({
-            "name": data["name"]
-        })
-        .execute()
-    )
-
-    return jsonify(result.data)
-
 @app.route("/v1/category", methods=["PATCH"])
 def update_category():
     if not is_user_authenticated():
         return jsonify(UNAUTHENTICATED), 401
     data = request.get_json()
     # { "id": 1, "name": "Fresh Produce" }
+
+    if not data:
+        return jsonify(DATA_REQUIRED), 400
 
     if "id" not in data:
         return jsonify(ID_REQUIRED), 400

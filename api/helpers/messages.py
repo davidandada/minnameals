@@ -4,3 +4,4 @@ NO_FIELD = {"message": "No field to update"}
 ID_REQUIRED = {"message": "ID is required"}
 POSITION_REQUIRED = {"message": "Position is required"}
 NAME_REQUIRED = {"message": "Name is required"}
+DATA_REQUIRED = {"message": "Data is required"}
