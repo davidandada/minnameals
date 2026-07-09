@@ -8,6 +8,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import QueryProvider from "./QueryProvider";
 import Header from "@/components/layouts/Header";
 import PageLayout from "@/components/layouts/PageLayout";
+import { NotificationProvider } from "@/components/NotificationProvider";
 import theme from "@/styles/theme";
 import "@/styles/globals.css";
 
@@ -29,17 +30,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
-            <QueryProvider>
-              <CssBaseline />
-              <Header />
-              <PageLayout>{children}</PageLayout>
-              {!isDev && (
-                <>
-                  <Analytics />
-                  <SpeedInsights />
-                </>
-              )}
-            </QueryProvider>
+            <NotificationProvider>
+              <QueryProvider>
+                <CssBaseline />
+                <Header />
+                <PageLayout>{children}</PageLayout>
+                {!isDev && (
+                  <>
+                    <Analytics />
+                    <SpeedInsights />
+                  </>
+                )}
+              </QueryProvider>
+            </NotificationProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS=--max_old_space_size=8192 next dev",
+    "dev": "bash scripts/dev.sh",
     "build": "next build",
     "start": "next start",
     "eslint": "eslint .",

@@ -22,6 +22,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { useNotification } from "@/components/NotificationProvider";
 import { updateListItem } from "@/api/listItems";
 import { type ListItemApi } from "@/types/api/listItems";
 
@@ -40,6 +41,7 @@ export default function ItemRow({ item, index }: Props) {
     disabled: item.is_checked,
   });
 
+  const { showSuccess, showError } = useNotification();
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
@@ -61,6 +63,17 @@ export default function ItemRow({ item, index }: Props) {
     onError: (err, updatedItemData, context) => {
       if (context?.previousItems) {
         queryClient.setQueryData(["items"], context.previousItems);
+      }
+      showError(err.message || "Error updating item");
+    },
+
+    onSuccess: (serverItem) => {
+      if (serverItem.is_archived) {
+        showSuccess(`${serverItem.item} deleted!`);
+      } else if (serverItem.is_checked !== item.is_checked) {
+        showSuccess(serverItem.is_checked ? `${serverItem.item} checked!` : `${serverItem.item} unchecked!`);
+      } else {
+        showSuccess(`${serverItem.item} updated!`);
       }
     },
 
@@ -127,7 +140,7 @@ export default function ItemRow({ item, index }: Props) {
     if (updateMutation.isError) return <ClearIcon color="baedaRed" />;
     else
       return (
-        <>
+        <Box onClick={(e) => e.stopPropagation()} sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
           <IconButton
             aria-label="edit"
             color={isItemInEdit ? "warning" : "info"}
@@ -139,12 +152,12 @@ export default function ItemRow({ item, index }: Props) {
           <IconButton aria-label="delete" color="error" onClick={handleDeleted}>
             <DeleteRoundedIcon fontSize="small" />
           </IconButton>
-        </>
+        </Box>
       );
   };
 
   return (
-    <ListItem disablePadding key={item.id} ref={ref} secondaryAction={renderSecondaryAction()}>
+    <ListItem disablePadding key={item.id} ref={ref}>
       <ListItemButton role={undefined} onClick={handleToggle} dense>
         <ListItemIcon>
           <Checkbox
@@ -158,17 +171,35 @@ export default function ItemRow({ item, index }: Props) {
           />
         </ListItemIcon>
         {isItemInEdit ? (
-          <Box component="form" onSubmit={handleUpdateItemName} sx={{ width: "80%" }}>
+          <Box component="form" onSubmit={handleUpdateItemName} sx={{ flexGrow: 1, minWidth: 0 }}>
             <TextField
               autoFocus
               color="baedaOrange"
               fullWidth
               id="editItemInput"
+              multiline
               onBlur={handleUpdateItemName}
               onChange={updateItemName}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  (e.target as HTMLElement).blur();
+                } else if (e.key === "Escape") {
+                  e.preventDefault();
+                  setUpdatedItemName(item.item);
+                  setIsItemInEdit(false);
+                }
+              }}
               size="small"
               value={updatedItemName}
               variant="standard"
+              slotProps={{
+                input: {
+                  sx: {
+                    typography: "body2",
+                  },
+                },
+              }}
             />
           </Box>
         ) : (
@@ -176,8 +207,10 @@ export default function ItemRow({ item, index }: Props) {
             className={classNames(isChecked ? "line-through text-baedaOrange-200" : "text-baedaGrey-50")}
             id={`shopping-list-item-${item.id}`}
             primary={item.item}
+            sx={{ minWidth: 0 }}
           />
         )}
+        {renderSecondaryAction()}
       </ListItemButton>
     </ListItem>
   );
