@@ -47,7 +47,22 @@ export default async function appFetch<T = any>(
       throw new Error(UNAUTHORISED);
     }
 
-    const body = await res.json();
+    let body: any = null;
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      try {
+        body = await res.json();
+      } catch (err) {
+        console.error("Failed to parse JSON response:", err);
+      }
+    } else {
+      try {
+        const text = await res.text();
+        body = { message: text };
+      } catch (err) {
+        console.error("Failed to read text response:", err);
+      }
+    }
 
     if (!res.ok) {
       console.error(`Flask API Error: ${res.status} ${res.statusText}`);
@@ -55,7 +70,7 @@ export default async function appFetch<T = any>(
       if (res.status === 500) {
         throw new Error(DEFAULT_ERROR_MESSAGE);
       }
-      throw new Error(body.message || DEFAULT_ERROR_MESSAGE);
+      throw new Error(body?.message || DEFAULT_ERROR_MESSAGE);
     }
 
     return body as T;

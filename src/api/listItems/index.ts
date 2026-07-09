@@ -12,7 +12,7 @@ async function getAuthCookie() {
 export async function getListItems() {
   const cookieHeader = await getAuthCookie();
 
-  const data = await appFetch<ListItemApi[]>("v1/list_items", { method: "GET" }, cookieHeader);
+  const data = await appFetch<ListItemApi[]>("v1/item", { method: "GET" }, cookieHeader);
   return data;
 }
 
@@ -20,7 +20,7 @@ export async function createListItem({ itemName, position }: { itemName: string,
   const cookieHeader = await getAuthCookie();
 
   const data = await appFetch<ListItemApi[]>(
-    "v1/list_items",
+    "v1/item",
     {
       method: "POST",
       body: { item: itemName, position },
@@ -35,7 +35,7 @@ export async function updateListItem(item: ListItemApi) {
   const cookieHeader = await getAuthCookie();
 
   const updatedItem = await appFetch<ListItemApi[]>(
-    "v1/list_items",
+    "v1/item",
     {
       method: "PATCH",
       body: item,
