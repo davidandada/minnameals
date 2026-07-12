@@ -30,16 +30,17 @@ import { type ListItemApi } from "@/types/api/listItems";
 type Props = {
   item: ListItemApi;
   index: number;
+  disableDrag?: boolean;
 };
 
-export default function ItemRow({ item, index }: Props) {
+export default function ItemRow({ item, index, disableDrag = false }: Props) {
   const [isItemInEdit, setIsItemInEdit] = useState<boolean>(false);
   const [updatedItemName, setUpdatedItemName] = useState(item.item);
   const { ref } = useSortable({
     id: item.id,
     index,
     data: item,
-    disabled: item.is_checked,
+    disabled: item.is_checked || disableDrag,
   });
 
   const { showSuccess, showError } = useNotification();
