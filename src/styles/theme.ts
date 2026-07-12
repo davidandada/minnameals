@@ -28,13 +28,23 @@ declare module '@mui/material/SvgIcon' {
   interface SvgIconPropsColorOverrides extends Record<CustomColorName, true> { }
 }
 
+// Light-background palette colours need dark text to meet WCAG AA contrast.
+// Dark-background colours (red, grey) keep white text.
+const contrastTextMap: Partial<Record<CustomColorName, string>> = {
+  baedaYellow: '#1a1a1a',
+  baedaGreen:  '#1a1a1a',
+  baedaOrange: '#1a1a1a',
+  baedaPink:   '#1a1a1a',
+  baedaBlue:   '#1a1a1a',
+};
+
 const customPaletteOptions = Object.entries(brandColours).reduce(
   (acc, [colorName, colorScale]) => {
     acc[colorName as CustomColorName] = {
       main: colorScale[500],
       light: colorScale[300],
       dark: colorScale[700],
-      contrastText: '#ffffff', // Adjust if some colors need black text
+      contrastText: contrastTextMap[colorName as CustomColorName] ?? '#ffffff',
       ...colorScale,
     };
     return acc;

@@ -138,13 +138,13 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button onClick={handleClose} color="inherit" size="small" sx={{ textTransform: "none" }}>
+        <Button onClick={handleClose} color="baedaRed" size="small" sx={{ textTransform: "none" }}>
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          color="baedaOrange"
+          color="baedaGreen"
           size="small"
           disabled={!categoryInputText.trim() || isPending}
           sx={{ textTransform: "none", fontWeight: "bold" }}
