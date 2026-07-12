@@ -60,13 +60,17 @@ def create_item():
     if not "position" in data:
         return jsonify(POSITION_REQUIRED), 400
  
+    insert_data = {
+        "item": data["item"],
+        "position": data["position"]
+    }
+    if "category_id" in data and data["category_id"] is not None:
+        insert_data["category_id"] = data["category_id"]
+
     result = (
         supabase.schema("mealplan").table("item")
-        .insert({
-            "item": data["item"],
-            "position": data["position"]
-        })
-        .select("*")
+        .insert(insert_data)
+        .select("*, category(id, name)")
         .execute()
     )
 

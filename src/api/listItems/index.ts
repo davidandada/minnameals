@@ -11,14 +11,14 @@ export async function getListItems() {
   return data;
 }
 
-export async function createListItem({ itemName, position }: { itemName: string, position: string }) {
+export async function createListItem({ itemName, position, category_id }: { itemName: string, position: string, category_id?: number | null }) {
   const cookieHeader = await getAuthCookie();
 
   const data = await appFetch<ListItemApi[]>(
     "v1/item",
     {
       method: "POST",
-      body: { item: itemName, position },
+      body: { item: itemName, position, ...(category_id != null && { category_id }) },
     },
     cookieHeader,
   );
