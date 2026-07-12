@@ -62,7 +62,7 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h6" color="baedaOrange" sx={{ fontWeight: "bold" }}>
+        <Typography variant="h6" component="span" color="baedaOrange" sx={{ fontWeight: "bold" }}>
           Create category
         </Typography>
       </DialogTitle>
