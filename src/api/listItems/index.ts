@@ -1,13 +1,8 @@
 "use server";
 
-import { cookies } from "next/headers";
 import appFetch from "@/api/fetch";
 import { ListItemApi } from "@/types/api/listItems";
-
-async function getAuthCookie() {
-  const cookieStore = await cookies();
-  return cookieStore.toString();
-}
+import { getAuthCookie } from "@/api/utils";
 
 export async function getListItems() {
   const cookieHeader = await getAuthCookie();
