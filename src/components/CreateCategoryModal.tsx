@@ -62,7 +62,7 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h6" color="baedaOrange.main" sx={{ fontWeight: "bold" }}>
+        <Typography variant="h6" color="baedaOrange" sx={{ fontWeight: "bold" }}>
           Create category
         </Typography>
       </DialogTitle>
@@ -120,6 +120,7 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
           <EmojiPicker
             theme={Theme.DARK}
             onEmojiClick={(emojiData) => setSelectedEmoji(emojiData.emoji)}
+            previewConfig={{ showPreview: false }}
             width="100%"
             height={300}
           />

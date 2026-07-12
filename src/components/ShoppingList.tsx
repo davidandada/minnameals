@@ -169,7 +169,7 @@ export default function ShoppingList() {
         Shopping list
       </Typography>
       <Box className="flex items-center gap-3 mb-2">
-        <Typography variant="body1" component="h3">Sort by:</Typography>
+        <Typography variant="body1" component="h3">Group by:</Typography>
         {!isSortModeReady || isLoading ? (
           <Box sx={{ display: "flex", gap: 0.5 }}>
             <Skeleton variant="rounded" width={90} height={30} sx={{ borderRadius: 1 }} />
