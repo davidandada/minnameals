@@ -23,9 +23,12 @@ type Props = {
   item: ListItemApi;
   onSelectCategory: (categoryId: number | null) => void;
   disabled?: boolean;
+  iconOnly?: boolean;
+  onMenuOpen?: () => void;
+  onMenuClose?: () => void;
 };
 
-export default function CategorySelector({ item, onSelectCategory, disabled }: Props) {
+export default function CategorySelector({ item, onSelectCategory, disabled, iconOnly = false, onMenuOpen, onMenuClose }: Props) {
   const { showSuccess, showError } = useNotification();
   const queryClient = useQueryClient();
 
@@ -52,10 +55,12 @@ export default function CategorySelector({ item, onSelectCategory, disabled }: P
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget);
+    onMenuOpen?.();
   };
 
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
+    onMenuClose?.();
   };
 
   const handleSelectCategory = (categoryId: number | null) => {
@@ -118,6 +123,7 @@ export default function CategorySelector({ item, onSelectCategory, disabled }: P
               emoji={emoji}
               name={catName}
               colorName={catColor}
+              iconOnly={iconOnly}
               onClick={disabled ? undefined : handleMenuOpen}
               sx={{
                 ...(disabled && { pointerEvents: "none", opacity: 0.6 }),
