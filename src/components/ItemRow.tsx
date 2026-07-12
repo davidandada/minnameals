@@ -15,13 +15,14 @@ import {
   ListItemText,
   TextField,
 } from "@mui/material";
+import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import EditIcon from "@mui/icons-material/Edit";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
+import CategorySelector from "@/components/CategorySelector";
 import { useNotification } from "@/components/NotificationProvider";
 import { updateListItem } from "@/api/listItems";
 import { type ListItemApi } from "@/types/api/listItems";
@@ -51,10 +52,25 @@ export default function ItemRow({ item, index }: Props) {
       await queryClient.cancelQueries({ queryKey: ["items"] });
 
       const previousItems = queryClient.getQueryData<ListItemApi[]>(["items"]);
+      const categories = queryClient.getQueryData<any[]>(["categories"]) || [];
 
       queryClient.setQueryData<ListItemApi[]>(["items"], (old) => {
         if (!old) return [];
-        return old.map((oldItem) => (oldItem.id === updatedItemData.id ? { ...oldItem, ...updatedItemData } : oldItem));
+        return old.map((oldItem) => {
+          if (oldItem.id === updatedItemData.id) {
+            const matchedCategory = updatedItemData.category_id
+              ? categories.find((c) => c.id === updatedItemData.category_id)
+              : null;
+            return {
+              ...oldItem,
+              ...updatedItemData,
+              category: matchedCategory
+                ? { id: matchedCategory.id, name: matchedCategory.name }
+                : null,
+            };
+          }
+          return oldItem;
+        });
       });
 
       return { previousItems };
@@ -203,12 +219,21 @@ export default function ItemRow({ item, index }: Props) {
             />
           </Box>
         ) : (
-          <ListItemText
-            className={classNames(isChecked ? "line-through text-baedaOrange-200" : "text-baedaGrey-50")}
-            id={`shopping-list-item-${item.id}`}
-            primary={item.item}
-            sx={{ minWidth: 0 }}
-          />
+          <>
+            <ListItemText
+              className={classNames(isChecked ? "line-through text-baedaOrange-200" : "text-baedaGrey-50")}
+              id={`shopping-list-item-${item.id}`}
+              primary={item.item}
+              sx={{ minWidth: 0 }}
+            />
+            <CategorySelector
+              item={item}
+              disabled={updateMutation.isPending}
+              onSelectCategory={(categoryId) => {
+                updateMutation.mutate({ ...item, category_id: categoryId });
+              }}
+            />
+          </>
         )}
         {renderSecondaryAction()}
       </ListItemButton>
