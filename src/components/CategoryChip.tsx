@@ -47,7 +47,7 @@ export default function CategoryChip({ category, iconOnly = false, onClick, sx }
 
   const emoji = category.emoji || "";
   const name = category.name || "";
-  const color = category.colour || "baedaGrey";
+  const colour = category.colour || "baedaGrey";
 
   return (
     <Chip
@@ -56,10 +56,10 @@ export default function CategoryChip({ category, iconOnly = false, onClick, sx }
       onClick={onClick}
       sx={{
         cursor: onClick ? "pointer" : "default",
-        backgroundColor: `color-mix(in srgb, var(--mui-palette-${color}-500) 15%, transparent)`,
-        color: `var(--mui-palette-${color}-200)`,
+        backgroundColor: `color-mix(in srgb, var(--mui-palette-${colour}-500) 15%, transparent)`,
+        color: `var(--mui-palette-${colour}-200)`,
         fontWeight: "bold",
-        border: `1px solid color-mix(in srgb, var(--mui-palette-${color}-500) 30%, transparent)`,
+        border: `1px solid color-mix(in srgb, var(--mui-palette-${colour}-500) 30%, transparent)`,
         height: "24px",
         ...(iconOnly && {
           width: "32px",
@@ -83,7 +83,7 @@ export default function CategoryChip({ category, iconOnly = false, onClick, sx }
         }),
         "&:hover": onClick
           ? {
-              backgroundColor: `color-mix(in srgb, var(--mui-palette-${color}-500) 25%, transparent)`,
+              backgroundColor: `color-mix(in srgb, var(--mui-palette-${colour}-500) 25%, transparent)`,
             }
           : undefined,
         ...sx,
