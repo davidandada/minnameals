@@ -4,7 +4,6 @@ from supabase import create_client
 from datetime import datetime, timezone
 from helpers.auth import is_cookie_valid, is_user_authenticated
 from helpers.messages import UNAUTHENTICATED, ITEM_REQUIRED, NO_FIELD, ID_REQUIRED, POSITION_REQUIRED, NAME_REQUIRED, DATA_REQUIRED
-from fractional_indexing import generate_key_between
 
 #------------------------------
 # SUPERBASE PUBLIC DEMO KEY
@@ -34,14 +33,7 @@ def auth():
 def get_item():
     if not is_user_authenticated():
         return jsonify(UNAUTHENTICATED), 401
-    rows = supabase.schema("mealplan").table("item").select("*, category(id, name)").eq("is_archived", False).order("position").execute()
-    return jsonify(rows.data if hasattr(rows, "data") else rows)
-
-@app.route("/v1/category", methods=["GET"])
-def get_category():
-    if not is_user_authenticated():
-        return jsonify(UNAUTHENTICATED), 401
-    rows = supabase.schema("mealplan").table("category").select("*").eq("is_archived", False).order("id").execute()
+    rows = supabase.schema("mealplan").table("item").select("*").eq("is_archived", False).order("position").execute()
     return jsonify(rows.data if hasattr(rows, "data") else rows)
 
 @app.route("/v1/item", methods=["POST"])
@@ -70,30 +62,7 @@ def create_item():
     result = (
         supabase.schema("mealplan").table("item")
         .insert(insert_data)
-        .select("*, category(id, name)")
-        .execute()
-    )
-
-    return jsonify(result.data)
-
-@app.route("/v1/category", methods=["POST"])
-def create_category():
-    if not is_user_authenticated():
-        return jsonify(UNAUTHENTICATED), 401
-    data = request.get_json()
-    # { "name": "Produce" }
-
-    if not data:
-        return jsonify(DATA_REQUIRED), 400
-
-    if not data.get("name"):
-        return jsonify(NAME_REQUIRED), 400
-
-    result = (
-        supabase.schema("mealplan").table("category")
-        .insert({
-            "name": data["name"]
-        })
+        .select("*")
         .execute()
     )
 
@@ -123,6 +92,9 @@ def update_item():
     if "position" in data:
         update_fields["position"] = data["position"]
 
+    if "category_position" in data:
+        update_fields["category_position"] = data["category_position"]
+
     if "is_archived" in data:
         update_fields["is_archived"] = data["is_archived"]
 
@@ -149,6 +121,38 @@ def update_item():
 
     return jsonify(result.data)
 
+@app.route("/v1/category", methods=["GET"])
+def get_category():
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
+    rows = supabase.schema("mealplan").table("category").select("*").eq("is_archived", False).order("id").execute()
+    return jsonify(rows.data if hasattr(rows, "data") else rows)
+
+@app.route("/v1/category", methods=["POST"])
+def create_category():
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
+    data = request.get_json()
+    # { "name": "Produce", "emoji": "🥦", "colour": "baedaGreen" }
+
+    if not data:
+        return jsonify(DATA_REQUIRED), 400
+
+    if not data.get("name"):
+        return jsonify(NAME_REQUIRED), 400
+
+    result = (
+        supabase.schema("mealplan").table("category")
+        .insert({
+            "name": data["name"],
+            "emoji": data.get("emoji") or None,
+            "colour": data.get("colour") or None
+        })
+        .execute()
+    )
+
+    return jsonify(result.data)
+
 @app.route("/v1/category", methods=["PATCH"])
 def update_category():
     if not is_user_authenticated():
@@ -166,6 +170,15 @@ def update_category():
 
     if "name" in data:
         update_fields["name"] = data["name"]
+
+    if "emoji" in data:
+        update_fields["emoji"] = data.get["emoji"] or None
+    
+    if "colour" in data:
+        update_fields["colour"] = data["colour"] or None
+
+    if "position" in data:
+        update_fields["position"] = data["position"]
 
     if "is_archived" in data:
         update_fields["is_archived"] = data["is_archived"]
