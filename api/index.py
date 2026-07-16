@@ -172,10 +172,10 @@ def update_category():
         update_fields["name"] = data["name"]
 
     if "emoji" in data:
-        update_fields["emoji"] = data["emoji"]
+        update_fields["emoji"] = data.get["emoji"] or None
     
     if "colour" in data:
-        update_fields["colour"] = data["colour"]
+        update_fields["colour"] = data["colour"] or None
 
     if "position" in data:
         update_fields["position"] = data["position"]
