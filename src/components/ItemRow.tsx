@@ -53,21 +53,14 @@ export default function ItemRow({ item, index, disableDrag = false }: Props) {
       await queryClient.cancelQueries({ queryKey: ["items"] });
 
       const previousItems = queryClient.getQueryData<ListItemApi[]>(["items"]);
-      const categories = queryClient.getQueryData<any[]>(["categories"]) || [];
 
       queryClient.setQueryData<ListItemApi[]>(["items"], (old) => {
         if (!old) return [];
         return old.map((oldItem) => {
           if (oldItem.id === updatedItemData.id) {
-            const matchedCategory = updatedItemData.category_id
-              ? categories.find((c) => c.id === updatedItemData.category_id)
-              : null;
             return {
               ...oldItem,
               ...updatedItemData,
-              category: matchedCategory
-                ? { id: matchedCategory.id, name: matchedCategory.name }
-                : null,
             };
           }
           return oldItem;

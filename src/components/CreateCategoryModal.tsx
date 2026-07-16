@@ -19,28 +19,28 @@ import CategoryChip from "@/components/CategoryChip";
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (emoji: string, color: string, name: string) => void;
+  onSubmit: (emoji: string, colour: string, name: string) => void;
   isPending?: boolean;
 };
 
 export default function CreateCategoryModal({ open, onClose, onSubmit, isPending }: Props) {
-  const [selectedEmoji, setSelectedEmoji] = useState<string>("🍎");
-  const [selectedColor, setSelectedColor] = useState<string>("baedaOrange");
+  const [selectedEmoji, setSelectedEmoji] = useState<string>("");
+  const [selectedColour, setSelectedColour] = useState<string>("");
   const [categoryInputText, setCategoryInputText] = useState<string>("");
 
   const handleClose = () => {
     setCategoryInputText("");
-    setSelectedEmoji("🍎");
-    setSelectedColor("baedaOrange");
+    setSelectedEmoji("");
+    setSelectedColour("");
     onClose();
   };
 
   const handleSubmit = () => {
     if (!categoryInputText.trim()) return;
-    onSubmit(selectedEmoji, selectedColor, categoryInputText);
+    onSubmit(selectedEmoji, selectedColour, categoryInputText);
     setCategoryInputText("");
-    setSelectedEmoji("🍎");
-    setSelectedColor("baedaOrange");
+    setSelectedEmoji("");
+    setSelectedColour("");
   };
 
   return (
@@ -88,21 +88,21 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
         />
 
         <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: "var(--mui-palette-baedaGrey-100)" }}>
-          Select Color
+          Select Colour
         </Typography>
         <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
-          {Object.entries(brandColours).map(([colorName, colorScale]) => {
-            const hexValue = colorScale[500];
+          {Object.entries(brandColours).map(([colourName, colourScale]) => {
+            const hexValue = colourScale[500];
             return (
               <IconButton
-                key={colorName}
-                onClick={() => setSelectedColor(colorName)}
+                key={colourName}
+                onClick={() => setSelectedColour(colourName)}
                 sx={{
                   width: 24,
                   height: 24,
                   backgroundColor: hexValue,
-                  border: selectedColor === colorName ? "2px solid #ffffff" : "2px solid transparent",
-                  boxShadow: selectedColor === colorName ? "0 0 4px rgba(255,255,255,0.6)" : "none",
+                  border: selectedColour === colourName ? "2px solid #ffffff" : "2px solid transparent",
+                  boxShadow: selectedColour === colourName ? "0 0 4px rgba(255,255,255,0.6)" : "none",
                   "&:hover": {
                     backgroundColor: hexValue,
                     opacity: 0.9,
@@ -131,9 +131,11 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
             Preview:
           </Typography>
           <CategoryChip
-            emoji={selectedEmoji}
-            name={categoryInputText || "New Category"}
-            colorName={selectedColor}
+            category={{
+              emoji: selectedEmoji,
+              name: categoryInputText || "New Category",
+              colour: selectedColour,
+            }}
           />
         </Box>
       </DialogContent>

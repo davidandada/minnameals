@@ -23,7 +23,7 @@ import { getListItems, updateListItem } from "@/api/listItems";
 import AddItem from "@/components/AddItem";
 import ItemRow from "@/components/ItemRow";
 import useSortListItems from "@/helpers/useSortListItems";
-import { splitCategoryName } from "@/helpers/categoryUtils";
+import { useCategories, getCategoryById } from "@/helpers/categoryUtils";
 import { type ListItemApi } from "@/types/api/listItems";
 
 type SortMode = "position" | "category";
@@ -50,6 +50,7 @@ export default function ShoppingList() {
     queryFn: getListItems,
     refetchInterval: () => (process.env.NODE_ENV === "development" ? false : 3000),
   });
+  const { data: categories = [] } = useCategories();
 
   const sortMutation = useMutation({
     mutationFn: updateListItem,
@@ -108,8 +109,9 @@ export default function ShoppingList() {
     let currentGroup: { label: string; items: ListItemApi[] } | null = null;
 
     for (const item of items) {
-      const categoryLabel = item.category
-        ? `${splitCategoryName(item.category.name).emoji} ${splitCategoryName(item.category.name).name}`.trim()
+      const category = getCategoryById(categories, item.category_id);
+      const categoryLabel = category
+        ? `${category.emoji} ${category.name}`.trim()
         : "Uncategorised";
 
       if (!currentGroup || currentGroup.label !== categoryLabel) {

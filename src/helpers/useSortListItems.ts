@@ -1,10 +1,12 @@
+import { useCategories, getCategoryById } from "@/helpers/categoryUtils";
 import { ListItemApi } from "@/types/api/listItems";
-import { splitCategoryName } from "@/helpers/categoryUtils";
 
 export default function useSortShoppingListItems(
   items: ListItemApi[],
   sortMode: "position" | "category" = "position",
 ) {
+  const { data: categories = [] } = useCategories();
+
   if (!items || !items.length) return [[], []];
   const [checked, unchecked] = separateByChecked(items);
   const sortedCheckedItems = [...checked].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
@@ -12,16 +14,19 @@ export default function useSortShoppingListItems(
   const sortedUncheckedItems = [...unchecked];
   if (sortMode === "category") {
     sortedUncheckedItems.sort((a, b) => {
-      if (a.category && b.category) {
-        const catA = splitCategoryName(a.category.name).name.toLowerCase();
-        const catB = splitCategoryName(b.category.name).name.toLowerCase();
-        if (catA !== catB) {
-          return catA.localeCompare(catB);
+      const catA = getCategoryById(categories, a.category_id);
+      const catB = getCategoryById(categories, b.category_id);
+
+      if (catA && catB) {
+        const nameA = catA.name.toLowerCase();
+        const nameB = catB.name.toLowerCase();
+        if (nameA !== nameB) {
+          return nameA.localeCompare(nameB);
         }
         return a.position.localeCompare(b.position);
       }
-      if (a.category) return -1;
-      if (b.category) return 1;
+      if (catA) return -1;
+      if (catB) return 1;
 
       return a.position.localeCompare(b.position);
     });

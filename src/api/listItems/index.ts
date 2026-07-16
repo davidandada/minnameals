@@ -18,7 +18,7 @@ export async function createListItem({ itemName, position, category_id }: { item
     "v1/item",
     {
       method: "POST",
-      body: { item: itemName, position, ...(category_id != null && { category_id }) },
+      body: { item: itemName, position, ...(category_id && { category_id }) },
     },
     cookieHeader,
   );

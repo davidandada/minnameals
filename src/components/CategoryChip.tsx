@@ -2,17 +2,53 @@
 
 import React from "react";
 import { Chip, type SxProps, type Theme } from "@mui/material";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
+import { type CategoryApi } from "@/types/api/category";
 
 type Props = {
-  emoji: string;
-  name: string;
-  colorName: string;
+  category?: Partial<CategoryApi> | null;
   iconOnly?: boolean;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   sx?: SxProps<Theme>;
 };
 
-export default function CategoryChip({ emoji, name, colorName, iconOnly = false, onClick, sx }: Props) {
+export default function CategoryChip({ category, iconOnly = false, onClick, sx }: Props) {
+  if (!category) {
+    return (
+      <Chip
+        icon={<LocalOfferOutlinedIcon sx={{ fontSize: "12px !important", mr: "4px !important" }} />}
+        label="+"
+        size="small"
+        onClick={onClick}
+        sx={{
+          cursor: onClick ? "pointer" : "default",
+          backgroundColor: "transparent",
+          color: "var(--mui-palette-baedaGrey-400)",
+          border: "1px solid var(--mui-palette-baedaGrey-600)",
+          minWidth: "auto",
+          px: 0.5,
+          "& .MuiChip-label": {
+            pl: 0.5,
+            pr: 0.5,
+            fontWeight: "bold",
+          },
+          "&:hover": onClick
+            ? {
+                borderColor: "var(--mui-palette-baedaOrange-300)",
+                color: "var(--mui-palette-baedaOrange-200)",
+                backgroundColor: "rgba(255, 192, 107, 0.08)",
+              }
+            : undefined,
+          ...sx,
+        }}
+      />
+    );
+  }
+
+  const emoji = category.emoji || "";
+  const name = category.name || "";
+  const colour = category.colour || "baedaGrey";
+
   return (
     <Chip
       label={iconOnly ? emoji : `${emoji} ${name}`}
@@ -20,10 +56,10 @@ export default function CategoryChip({ emoji, name, colorName, iconOnly = false,
       onClick={onClick}
       sx={{
         cursor: onClick ? "pointer" : "default",
-        backgroundColor: `color-mix(in srgb, var(--mui-palette-${colorName}-500) 15%, transparent)`,
-        color: `var(--mui-palette-${colorName}-200)`,
+        backgroundColor: `color-mix(in srgb, var(--mui-palette-${colour}-500) 15%, transparent)`,
+        color: `var(--mui-palette-${colour}-200)`,
         fontWeight: "bold",
-        border: `1px solid color-mix(in srgb, var(--mui-palette-${colorName}-500) 30%, transparent)`,
+        border: `1px solid color-mix(in srgb, var(--mui-palette-${colour}-500) 30%, transparent)`,
         height: "24px",
         ...(iconOnly && {
           width: "32px",
@@ -47,7 +83,7 @@ export default function CategoryChip({ emoji, name, colorName, iconOnly = false,
         }),
         "&:hover": onClick
           ? {
-              backgroundColor: `color-mix(in srgb, var(--mui-palette-${colorName}-500) 25%, transparent)`,
+              backgroundColor: `color-mix(in srgb, var(--mui-palette-${colour}-500) 25%, transparent)`,
             }
           : undefined,
         ...sx,
