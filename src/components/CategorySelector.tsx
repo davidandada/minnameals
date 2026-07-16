@@ -4,19 +4,17 @@ import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
-  Chip,
   Divider,
   Menu,
   MenuItem,
   Skeleton,
   Typography,
 } from "@mui/material";
-import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
-import { getCategories, createCategory } from "@/api/categories";
+import { createCategory } from "@/api/categories";
 import CategoryChip from "@/components/CategoryChip";
 import CreateCategoryModal from "@/components/CreateCategoryModal";
 import { useNotification } from "@/components/NotificationProvider";
-import { splitCategoryName, formatCategoryName } from "@/helpers/categoryUtils";
+import { useCategories, getCategoryById } from "@/helpers/categoryUtils";
 import { type ListItemApi } from "@/types/api/listItems";
 
 type Props = {
@@ -35,10 +33,8 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
 
-  const { data: categories = [], isLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
-  });
+  const { data: categories = [], isLoading } = useCategories();
+  const category = getCategoryById(categories, item.category_id);
 
   const createCategoryMutation = useMutation({
     mutationFn: createCategory,
@@ -77,9 +73,8 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
     setIsCreateDialogOpen(false);
   };
 
-  const handleCreateCategorySubmit = (emoji: string, color: string, name: string) => {
-    const formattedName = formatCategoryName(emoji, color, name);
-    createCategoryMutation.mutate({ name: formattedName });
+  const handleCreateCategorySubmit = (emoji: string, colour: string, name: string) => {
+    createCategoryMutation.mutate({ name, emoji, colour });
   };
 
   if (isLoading) {
@@ -115,49 +110,14 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
         flexShrink: 0,
       }}
     >
-      {item.category ? (
-        (() => {
-          const { emoji, color: catColor, name: catName } = splitCategoryName(item.category.name);
-          return (
-            <CategoryChip
-              emoji={emoji}
-              name={catName}
-              colorName={catColor}
-              iconOnly={iconOnly}
-              onClick={disabled ? undefined : handleMenuOpen}
-              sx={{
-                ...(disabled && { pointerEvents: "none", opacity: 0.6 }),
-              }}
-            />
-          );
-        })()
-      ) : (
-        <Chip
-          icon={<LocalOfferOutlinedIcon sx={{ fontSize: "12px !important", mr: "4px !important" }} />}
-          label="+"
-          size="small"
-          onClick={disabled ? undefined : handleMenuOpen}
-          sx={{
-            cursor: disabled ? "default" : "pointer",
-            backgroundColor: "transparent",
-            color: "var(--mui-palette-baedaGrey-400)",
-            border: "1px solid var(--mui-palette-baedaGrey-600)",
-            minWidth: "auto",
-            px: 0.5,
-            "& .MuiChip-label": {
-              pl: 0.5,
-              pr: 0.5,
-              fontWeight: "bold",
-            },
-            "&:hover": {
-              borderColor: "var(--mui-palette-baedaOrange-300)",
-              color: "var(--mui-palette-baedaOrange-200)",
-              backgroundColor: "rgba(255, 192, 107, 0.08)",
-            },
-            ...(disabled && { pointerEvents: "none", opacity: 0.6 }),
-          }}
-        />
-      )}
+      <CategoryChip
+        category={category}
+        iconOnly={iconOnly}
+        onClick={disabled ? undefined : handleMenuOpen}
+        sx={{
+          ...(disabled && { pointerEvents: "none", opacity: 0.6 }),
+        }}
+      />
 
       <Menu
         anchorEl={menuAnchorEl}
@@ -181,7 +141,6 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
           </MenuItem>
         )}
         {categories.map((cat) => {
-          const { emoji, name: catName } = splitCategoryName(cat.name);
           return (
             <MenuItem
               key={cat.id}
@@ -189,7 +148,7 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
               selected={item.category_id === cat.id}
             >
               <Typography variant="body2">
-                {emoji} {catName}
+                {cat.emoji} {cat.name}
               </Typography>
             </MenuItem>
           );

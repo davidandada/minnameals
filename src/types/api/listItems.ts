@@ -8,10 +8,6 @@ export type ListItemApi = {
   position: string;
   updated_at: string;
   category_id?: number | null;
-  category?: {
-    id: number;
-    name: string;
-  } | null;
 }
 
 export type NewItem = {

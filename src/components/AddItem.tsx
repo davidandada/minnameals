@@ -14,7 +14,6 @@ export default function AddItem() {
   const [inputShowing, setInputShowing] = useState<boolean>(false);
   const [itemName, setItemName] = useState<string>("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [categoryData, setCategoryData] = useState<{ id: number; name: string } | null>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { showSuccess, showError } = useNotification();
@@ -31,7 +30,6 @@ export default function AddItem() {
     archived_at: null,
     position: "",
     category_id: categoryId,
-    category: categoryData,
   };
 
   const createMutation = useMutation({
@@ -52,7 +50,6 @@ export default function AddItem() {
         archived_at: null,
         position: position,
         category_id: category_id ?? null,
-        category: categoryData,
       };
 
       queryClient.setQueryData<ListItemApi[]>(["items"], (old) => {
@@ -82,7 +79,6 @@ export default function AddItem() {
     setInputShowing(false);
     setItemName("");
     setCategoryId(null);
-    setCategoryData(null);
   };
 
   const handleFormBlur = () => {
@@ -114,18 +110,10 @@ export default function AddItem() {
 
     setItemName("");
     setCategoryId(null);
-    setCategoryData(null);
   };
 
   const handleCategorySelect = (newCategoryId: number | null) => {
     setCategoryId(newCategoryId);
-    if (newCategoryId === null) {
-      setCategoryData(null);
-    } else {
-      const categories = queryClient.getQueryData<{ id: number; name: string }[]>(["categories"]) ?? [];
-      const cat = categories.find((c) => c.id === newCategoryId);
-      setCategoryData(cat ? { id: cat.id, name: cat.name } : null);
-    }
   };
 
   return inputShowing ? (

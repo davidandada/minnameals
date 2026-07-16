@@ -19,19 +19,19 @@ import CategoryChip from "@/components/CategoryChip";
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (emoji: string, color: string, name: string) => void;
+  onSubmit: (emoji: string, colour: string, name: string) => void;
   isPending?: boolean;
 };
 
 export default function CreateCategoryModal({ open, onClose, onSubmit, isPending }: Props) {
-  const [selectedEmoji, setSelectedEmoji] = useState<string>("🍎");
-  const [selectedColor, setSelectedColor] = useState<string>("baedaOrange");
+  const [selectedEmoji, setSelectedEmoji] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("");
   const [categoryInputText, setCategoryInputText] = useState<string>("");
 
   const handleClose = () => {
     setCategoryInputText("");
-    setSelectedEmoji("🍎");
-    setSelectedColor("baedaOrange");
+    setSelectedEmoji("");
+    setSelectedColor("");
     onClose();
   };
 
@@ -39,8 +39,8 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
     if (!categoryInputText.trim()) return;
     onSubmit(selectedEmoji, selectedColor, categoryInputText);
     setCategoryInputText("");
-    setSelectedEmoji("🍎");
-    setSelectedColor("baedaOrange");
+    setSelectedEmoji("");
+    setSelectedColor("");
   };
 
   return (
@@ -131,9 +131,11 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
             Preview:
           </Typography>
           <CategoryChip
-            emoji={selectedEmoji}
-            name={categoryInputText || "New Category"}
-            colorName={selectedColor}
+            category={{
+              emoji: selectedEmoji,
+              name: categoryInputText || "New Category",
+              colour: selectedColor,
+            }}
           />
         </Box>
       </DialogContent>
