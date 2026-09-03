@@ -121,6 +121,29 @@ def update_item():
 
     return jsonify(result.data)
 
+@app.route("/v1/item/archive_all", methods=["PATCH"])
+def archive_all_items():
+    if not is_user_authenticated():
+        return jsonify(UNAUTHENTICATED), 401
+
+    update_fields = {
+        "is_archived": True,
+        "archived_at": datetime.now(timezone.utc).isoformat(),
+        "position": None,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    result = (
+        supabase.schema("mealplan")
+        .table("item")
+        .update(update_fields)
+        .eq("is_archived", False)
+        .select("*")
+        .execute()
+    )
+
+    return jsonify(result.data)
+
 @app.route("/v1/category", methods=["GET"])
 def get_category():
     if not is_user_authenticated():
