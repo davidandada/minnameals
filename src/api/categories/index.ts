@@ -29,3 +29,16 @@ export async function createCategory({
   );
   return data[0];
 }
+
+export async function updateCategory(category: Partial<CategoryApi> & { id: number }) {
+  const cookieHeader = await getAuthCookie();
+  const data = await appFetch<CategoryApi[]>(
+    "v1/category",
+    {
+      method: "PATCH",
+      body: category,
+    },
+    cookieHeader,
+  );
+  return data[0];
+}

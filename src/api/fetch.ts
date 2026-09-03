@@ -3,7 +3,8 @@ import { PASSWORD_ROUTE } from "@/types/constants";
 
 type FetchOptions =
   | { method: 'GET' }
-  | { method: 'POST' | 'PATCH'; body: Record<string, any> };
+  | { method: 'POST'; body: Record<string, any> }
+  | { method: 'PATCH'; body?: Record<string, any> };
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; //
@@ -32,7 +33,7 @@ export default async function appFetch<T = any>(
       ...(customCookieHeader && { 'Cookie': customCookieHeader }),
       ...(isPostOrPatch && { 'Content-Type': 'application/json' })
     },
-    ...(isPostOrPatch && { body: JSON.stringify(options.body) })
+    ...(isPostOrPatch && options.body !== undefined && { body: JSON.stringify(options.body) })
   };
 
   try {

@@ -40,3 +40,17 @@ export async function updateListItem(item: ListItemApi) {
 
   return updatedItem[0];
 }
+
+export async function archiveAllListItems() {
+  const cookieHeader = await getAuthCookie();
+
+  const data = await appFetch<ListItemApi[]>(
+    "v1/item/archive_all",
+    {
+      method: "PATCH",
+    },
+    cookieHeader,
+  );
+
+  return data;
+}

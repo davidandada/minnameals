@@ -68,7 +68,7 @@ const brandColours = {
   }, baedaGrey: {
     50: '#eeefef',
     100: '#cacccd',
-    200: '##b0b3b5',
+    200: '#b0b3b5',
     300: '#8c9094',
     400: '#757b7f',
     500: '#535a5f',

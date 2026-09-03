@@ -9,6 +9,7 @@ import QueryProvider from "./QueryProvider";
 import Header from "@/components/layouts/Header";
 import PageLayout from "@/components/layouts/PageLayout";
 import { NotificationProvider } from "@/components/NotificationProvider";
+import { ListProvider } from "@/context/ListContext";
 import theme from "@/styles/theme";
 import "@/styles/globals.css";
 
@@ -32,9 +33,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ThemeProvider theme={theme}>
             <NotificationProvider>
               <QueryProvider>
-                <CssBaseline />
-                <Header />
-                <PageLayout>{children}</PageLayout>
+                <ListProvider>
+                  <CssBaseline />
+                  <Header />
+                  <PageLayout>{children}</PageLayout>
+                </ListProvider>
                 {!isDev && (
                   <>
                     <Analytics />
