@@ -1,25 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useMutation, useQueryClient, UseMutationResult } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { archiveAllListItems } from "@/api/listItems";
 import { useNotification } from "@/components/NotificationProvider";
 import { ListItemApi } from "@/types/api/listItems";
 
 export type SortMode = "position" | "category";
 
-type ListContextType = {
-  sortMode: SortMode;
-  setSortMode: (mode: SortMode) => void;
-  showCompleted: boolean;
-  setShowCompleted: (show: boolean | ((prev: boolean) => boolean)) => void;
-  archiveAllMutation: UseMutationResult<ListItemApi[], Error, void, { previousItems?: ListItemApi[] }>;
-  isSortModeReady: boolean;
-};
-
-const ListContext = createContext<ListContextType | undefined>(undefined);
-
-export function ListProvider({ children }: { children: React.ReactNode }) {
+export function useListPreferences() {
   const [sortMode, setSortModeState] = useState<SortMode>("position");
   const [showCompleted, setShowCompletedState] = useState<boolean>(true);
   const [isSortModeReady, setIsSortModeReady] = useState(false);
@@ -73,26 +62,12 @@ export function ListProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  return (
-    <ListContext.Provider
-      value={{
-        sortMode,
-        setSortMode,
-        showCompleted,
-        setShowCompleted,
-        archiveAllMutation,
-        isSortModeReady,
-      }}
-    >
-      {children}
-    </ListContext.Provider>
-  );
-}
-
-export function useListContext() {
-  const context = useContext(ListContext);
-  if (!context) {
-    throw new Error("useListContext must be used within a ListProvider");
-  }
-  return context;
+  return {
+    sortMode,
+    setSortMode,
+    showCompleted,
+    setShowCompleted,
+    archiveAllMutation,
+    isSortModeReady,
+  };
 }

@@ -40,12 +40,12 @@ import ItemRow from "@/components/ItemRow";
 import ManageCategoriesModal from "@/components/ManageCategoriesModal";
 import useSortListItems from "@/helpers/useSortListItems";
 import { useCategories, getCategoryById } from "@/helpers/categoryUtils";
-import { useListContext, SortMode } from "@/context/ListContext";
+import { useListPreferences, SortMode } from "@/helpers/listPreferences";
 import { type ListItemApi } from "@/types/api/listItems";
 
 export default function ShoppingList() {
   const { sortMode, setSortMode, isSortModeReady, showCompleted, setShowCompleted, archiveAllMutation } =
-    useListContext();
+    useListPreferences();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [groupByAnchorEl, setGroupByAnchorEl] = useState<null | HTMLElement>(null);
