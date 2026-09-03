@@ -135,7 +135,7 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
       >
         {item.category_id && (
           <MenuItem onClick={() => handleSelectCategory(null)}>
-            <Typography variant="body2" color="error">
+            <Typography variant="body2" className="text-baedaRed-500">
               Unassigned
             </Typography>
           </MenuItem>
@@ -154,7 +154,7 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
           );
         })}
         {categories.length > 0 && <Divider sx={{ my: 0.5 }} />}
-        <MenuItem onClick={handleOpenCreateDialog} sx={{ color: "var(--mui-palette-baedaPink-500)" }}>
+        <MenuItem onClick={handleOpenCreateDialog} className="text-baedaPink-500">
           <Typography variant="body2" sx={{ fontWeight: "bold" }}>
             + New
           </Typography>
