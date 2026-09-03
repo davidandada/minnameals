@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import {
   Box,
@@ -15,18 +15,28 @@ import {
 } from "@mui/material";
 import brandColours from "@/styles/colours";
 import CategoryChip from "@/components/CategoryChip";
+import { type CategoryApi } from "@/types/api/category";
 
 type Props = {
   open: boolean;
   onClose: () => void;
   onSubmit: (emoji: string, colour: string, name: string) => void;
   isPending?: boolean;
+  initialCategory?: CategoryApi | null;
 };
 
-export default function CreateCategoryModal({ open, onClose, onSubmit, isPending }: Props) {
+export default function CreateCategoryModal({ open, onClose, onSubmit, isPending, initialCategory }: Props) {
   const [selectedEmoji, setSelectedEmoji] = useState<string>("");
   const [selectedColour, setSelectedColour] = useState<string>("");
   const [categoryInputText, setCategoryInputText] = useState<string>("");
+
+  useEffect(() => {
+    if (open) {
+      setCategoryInputText(initialCategory?.name || "");
+      setSelectedEmoji(initialCategory?.emoji || "");
+      setSelectedColour(initialCategory?.colour || "");
+    }
+  }, [open, initialCategory]);
 
   const handleClose = () => {
     setCategoryInputText("");
@@ -54,7 +64,7 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
             backgroundColor: "var(--mui-palette-baedaGrey-800)",
             backgroundImage: "none",
             border: "1px solid var(--mui-palette-baedaGrey-700)",
-            borderRadius: "12px",
+            borderRadius: "16px",
             width: "100%",
             maxWidth: "360px",
           },
@@ -63,7 +73,7 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
     >
       <DialogTitle sx={{ pb: 1 }}>
         <Typography variant="h6" component="span" color="baedaOrange" sx={{ fontWeight: "bold" }}>
-          Create category
+          {initialCategory ? "Edit category" : "Create category"}
         </Typography>
       </DialogTitle>
       <DialogContent sx={{ pb: 2 }}>
@@ -151,7 +161,7 @@ export default function CreateCategoryModal({ open, onClose, onSubmit, isPending
           disabled={!categoryInputText.trim() || isPending}
           sx={{ textTransform: "none", fontWeight: "bold" }}
         >
-          {isPending ? "Creating..." : "Create"}
+          {isPending ? (initialCategory ? "Saving..." : "Creating...") : initialCategory ? "Save" : "Create"}
         </Button>
       </DialogActions>
     </Dialog>

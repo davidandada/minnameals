@@ -104,6 +104,8 @@
   --content-top-padding: calc(var(--header-height) + 4rem);
 }
 
+html,
 body {
-  min-height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
 }

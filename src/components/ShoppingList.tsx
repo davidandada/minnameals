@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSortable } from "@dnd-kit/react/sortable";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
@@ -13,37 +13,27 @@ import {
   ListItemButton,
   ListItemIcon,
   Skeleton,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import CategoryIcon from "@mui/icons-material/Category";
-import SortIcon from "@mui/icons-material/Sort";
 import { getListItems, updateListItem } from "@/api/listItems";
 import AddItem from "@/components/AddItem";
 import ItemRow from "@/components/ItemRow";
+import ShoppingListActions from "@/components/ShoppingListActions";
 import useSortListItems from "@/helpers/useSortListItems";
 import { useCategories, getCategoryById } from "@/helpers/categoryUtils";
+import { useListPreferences } from "@/helpers/listPreferences";
 import { type ListItemApi } from "@/types/api/listItems";
 
-type SortMode = "position" | "category";
-
 export default function ShoppingList() {
-  const [sortMode, setSortMode] = useState<SortMode>("position");
-  const [isSortModeReady, setIsSortModeReady] = useState(false);
+  const {
+    sortMode,
+    setSortMode,
+    isSortModeReady,
+    showCompleted,
+    setShowCompleted,
+    archiveAllMutation,
+  } = useListPreferences();
 
-  useEffect(() => {
-    const stored = localStorage.getItem("baeda_sort_mode") as SortMode | null;
-    if (stored) setSortMode(stored);
-    setIsSortModeReady(true);
-  }, []);
-
-  const handleSortModeChange = (_: React.MouseEvent<HTMLElement>, newMode: SortMode | null) => {
-    if (newMode !== null) {
-      setSortMode(newMode);
-      localStorage.setItem("baeda_sort_mode", newMode);
-    }
-  };
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["items"],
@@ -166,49 +156,43 @@ export default function ShoppingList() {
   };
 
   return (
-    <section className="max-w-130.5 mx-auto">
-      <Typography variant="h4" component="h2" className="mb-6 text-baedaOrange-500">
-        Shopping list
-      </Typography>
-      <Box className="flex items-center gap-3 mb-2">
-        <Typography variant="body1" component="h3">Group by:</Typography>
-        {!isSortModeReady || isLoading ? (
-          <Box sx={{ display: "flex", gap: 0.5 }}>
-            <Skeleton variant="rounded" width={90} height={30} sx={{ borderRadius: 1 }} />
-            <Skeleton variant="rounded" width={100} height={30} sx={{ borderRadius: 1 }} />
-          </Box>
-        ) : (
-          <ToggleButtonGroup
-            exclusive
-            value={sortMode}
-            onChange={handleSortModeChange}
-            aria-label="sort mode"
-            size="small"
-          >
-            <ToggleButton value="position" aria-label="sort by position">
-              <SortIcon fontSize="small" sx={{ mr: 0.5 }} />
-              Default
-            </ToggleButton>
-            <ToggleButton value="category" aria-label="sort by category">
-              <CategoryIcon fontSize="small" sx={{ mr: 0.5 }} />
-              Category
-            </ToggleButton>
-          </ToggleButtonGroup>
-        )}
+    <section className="max-w-130.5 w-full mx-auto h-full flex flex-col overflow-hidden">
+      {/* Sticky Header Row */}
+      <Box className="flex items-center justify-between mb-4 flex-shrink-0">
+        <Typography variant="h4" component="h2" className="text-baedaOrange-500 font-bold">
+          Shopping list
+        </Typography>
+
+        <ShoppingListActions
+          sortMode={sortMode}
+          onSelectSortMode={setSortMode}
+          showCompleted={showCompleted}
+          onToggleShowCompleted={() => setShowCompleted((prev) => !prev)}
+          onClearList={() => archiveAllMutation.mutate()}
+          isClearing={archiveAllMutation.isPending}
+        />
       </Box>
-      <List className="flex flex-col gap-2">
-        {!isSortModeReady || isLoading ? (
-          renderSkeletonList()
-        ) : sortMode === "category" ? (
-          renderCategoryGroupedList(uncheckedItems)
-        ) : (
-          <DragDropProvider onDragEnd={handleDrop}>{renderList(uncheckedItems)}</DragDropProvider>
-        )}
-        <Divider />
-        <AddItem />
-        <Divider />
-        {!isSortModeReady || isLoading ? renderSkeletonList(3) : renderList(checkedItems)}
-      </List>
+
+      {/* Only Scrollable Element: Shopping List */}
+      <Box className="flex-1 overflow-y-auto min-h-0 pr-1">
+        <List className="flex flex-col gap-2">
+          {!isSortModeReady || isLoading ? (
+            renderSkeletonList()
+          ) : sortMode === "category" ? (
+            renderCategoryGroupedList(uncheckedItems)
+          ) : (
+            <DragDropProvider onDragEnd={handleDrop}>{renderList(uncheckedItems)}</DragDropProvider>
+          )}
+          {uncheckedItems.length > 0 && <Divider />}
+          <AddItem />
+          {showCompleted && checkedItems.length > 0 && (
+            <>
+              <Divider />
+              {!isSortModeReady || isLoading ? renderSkeletonList(3) : renderList(checkedItems)}
+            </>
+          )}
+        </List>
+      </Box>
     </section>
   );
 }
