@@ -1,28 +1,20 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import classNames from "classnames";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSortable } from "@dnd-kit/react/sortable";
 import {
   Box,
   Checkbox,
-  CircularProgress,
-  IconButton,
-  ListItem,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
   TextField,
 } from "@mui/material";
-import CancelIcon from "@mui/icons-material/Cancel";
-import CheckIcon from "@mui/icons-material/Check";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import ClearIcon from "@mui/icons-material/Clear";
-import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import EditIcon from "@mui/icons-material/Edit";
 import CategorySelector from "@/components/CategorySelector";
+import SwipeableRow from "@/components/common/SwipeableRow";
 import { useNotification } from "@/components/NotificationProvider";
 import { updateListItem } from "@/api/listItems";
 import { type ListItemApi } from "@/types/api/listItems";
@@ -36,11 +28,12 @@ type Props = {
 export default function ItemRow({ item, index, disableDrag = false }: Props) {
   const [isItemInEdit, setIsItemInEdit] = useState<boolean>(false);
   const [updatedItemName, setUpdatedItemName] = useState(item.item);
+
   const { ref } = useSortable({
     id: item.id,
     index,
     data: item,
-    disabled: item.is_checked || disableDrag,
+    disabled: item.is_checked || disableDrag || isItemInEdit,
   });
 
   const { showSuccess, showError } = useNotification();
@@ -89,11 +82,10 @@ export default function ItemRow({ item, index, disableDrag = false }: Props) {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["items"] });
-      setTimeout(() => {
-        updateMutation.reset();
-      }, 1000);
     },
   });
+
+  const isDeleting = Boolean(updateMutation.isPending && updateMutation.variables?.is_archived);
 
   const handleToggle = () => {
     if (isItemInEdit) return;
@@ -140,119 +132,126 @@ export default function ItemRow({ item, index, disableDrag = false }: Props) {
 
   const isChecked = item.is_checked;
 
-  const renderSecondaryAction = () => {
-    if (updateMutation.isPending)
-      return (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CircularProgress color="baedaRed" size={18} />
-        </Box>
-      );
-    if (updateMutation.isSuccess) return <CheckIcon color="baedaGreen" />;
-    if (updateMutation.isError) return <ClearIcon color="baedaRed" />;
-    else
-      return (
-        <Box onClick={(e) => e.stopPropagation()} sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-          <IconButton
-            aria-label="edit"
-            color={isItemInEdit ? "warning" : "info"}
-            id="cancelIcon"
-            onClick={isItemInEdit ? cancelEdit : enterEditMode}
-          >
-            {isItemInEdit ? <CancelIcon fontSize="small" /> : <EditIcon fontSize="small" />}
-          </IconButton>
-          <IconButton aria-label="delete" color="error" onClick={handleDeleted}>
-            <DeleteRoundedIcon fontSize="small" />
-          </IconButton>
-        </Box>
-      );
-  };
-
   return (
-    <ListItem disablePadding key={item.id} ref={ref}>
-      <ListItemButton
-        role={undefined}
-        onClick={handleToggle}
-        dense
-        onBlur={() => {
-          if (!isItemInEdit) return;
-          editBlurTimeoutRef.current = setTimeout(() => {
-            if (isCategoryMenuOpenRef.current) return;
-            saveAndExitEdit();
-          }, 200);
-        }}
-        onFocus={cancelPendingBlur}
-      >
-        <ListItemIcon>
+    <SwipeableRow
+      dndRef={ref}
+      onDelete={handleDeleted}
+      isDeleting={isDeleting}
+      disabled={isItemInEdit}
+      onClick={isItemInEdit ? undefined : enterEditMode}
+      deleteLabel="delete item"
+      onBlur={() => {
+        if (!isItemInEdit) return;
+        editBlurTimeoutRef.current = setTimeout(() => {
+          if (isCategoryMenuOpenRef.current) return;
+          saveAndExitEdit();
+        }, 200);
+      }}
+      onFocus={cancelPendingBlur}
+    >
+      {/* Generous Hitbox Checkbox / Radio toggle */}
+      <ListItemIcon sx={{ minWidth: 0, mr: 1.5, display: "flex", alignItems: "center" }}>
+        <Box
+          onClick={(e) => {
+            e.stopPropagation();
+            handleToggle();
+          }}
+          sx={{
+            p: 0.75,
+            m: -0.75,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            borderRadius: "50%",
+            "&:hover": {
+              backgroundColor: "var(--mui-palette-baedaOrange-100)",
+              opacity: 0.8,
+            },
+          }}
+          aria-label={isChecked ? "Mark unchecked" : "Mark checked"}
+        >
           <Checkbox
             checked={isChecked}
-            checkedIcon={<CheckCircleIcon className="text-baedaOrange-200" />}
+            checkedIcon={<CheckCircleIcon sx={{ fontSize: 24 }} className="text-baedaOrange-200" />}
             disableRipple
-            edge="start"
-            icon={<CircleOutlinedIcon className="text-baedaGrey-50" />}
+            icon={<CircleOutlinedIcon sx={{ fontSize: 24 }} className="text-baedaGrey-50" />}
             slotProps={{ input: { "aria-labelledby": `shopping-list-item-${item.id}` } }}
             tabIndex={-1}
+            sx={{ p: 0, pointerEvents: "none" }}
           />
-        </ListItemIcon>
-        {isItemInEdit ? (
-          <Box component="form" onSubmit={(e) => { e.preventDefault(); cancelPendingBlur(); saveAndExitEdit(); }} sx={{ flexGrow: 1, minWidth: 0 }}>
-            <TextField
-              autoFocus
-              onFocus={(e) => {
-                const len = e.target.value.length;
-                e.target.setSelectionRange(len, len);
-              }}
-              color="baedaOrange"
-              fullWidth
-              id="editItemInput"
-              multiline
-              onChange={(e) => setUpdatedItemName(e.currentTarget.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  cancelPendingBlur();
-                  saveAndExitEdit();
-                } else if (e.key === "Escape") {
-                  e.preventDefault();
-                  cancelEdit();
-                }
-              }}
-              size="small"
-              value={updatedItemName}
-              variant="standard"
-              slotProps={{
-                input: {
-                  sx: {
-                    typography: "body2",
-                  },
-                },
-              }}
-            />
-          </Box>
-        ) : (
-          <ListItemText
-            className={classNames(isChecked ? "line-through text-baedaOrange-200" : "text-baedaGrey-50")}
-            id={`shopping-list-item-${item.id}`}
-            primary={item.item}
-            sx={{ minWidth: 0 }}
-          />
-        )}
-        <CategorySelector
-          item={item}
-          disabled={updateMutation.isPending}
-          iconOnly={!isItemInEdit}
-          onMenuOpen={() => {
-            isCategoryMenuOpenRef.current = true;
+        </Box>
+      </ListItemIcon>
+
+      {/* Row Text Content / Inline Edit Form */}
+      {isItemInEdit ? (
+        <Box
+          component="form"
+          onSubmit={(e) => {
+            e.preventDefault();
             cancelPendingBlur();
+            saveAndExitEdit();
           }}
-          onMenuClose={() => {
-            isCategoryMenuOpenRef.current = false;
-          }}
-          onSelectCategory={(categoryId) => {
-            updateMutation.mutate({ ...item, category_id: categoryId });
-          }}
+          sx={{ flexGrow: 1, minWidth: 0 }}
+        >
+          <TextField
+            autoFocus
+            onFocus={(e) => {
+              const len = e.target.value.length;
+              e.target.setSelectionRange(len, len);
+            }}
+            color="baedaOrange"
+            fullWidth
+            id="editItemInput"
+            multiline
+            onChange={(e) => setUpdatedItemName(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                cancelPendingBlur();
+                saveAndExitEdit();
+              } else if (e.key === "Escape") {
+                e.preventDefault();
+                cancelEdit();
+              }
+            }}
+            size="small"
+            value={updatedItemName}
+            variant="standard"
+            slotProps={{
+              input: {
+                sx: {
+                  typography: "body2",
+                },
+              },
+            }}
+          />
+        </Box>
+      ) : (
+        <ListItemText
+          className={classNames(isChecked ? "line-through text-baedaOrange-200" : "text-baedaGrey-50")}
+          id={`shopping-list-item-${item.id}`}
+          primary={item.item}
+          sx={{ minWidth: 0, flexGrow: 1 }}
         />
-        {renderSecondaryAction()}
-      </ListItemButton>
-    </ListItem>
+      )}
+
+      {/* Category Pill at the End of Row */}
+      <CategorySelector
+        item={item}
+        disabled={updateMutation.isPending}
+        iconOnly={false}
+        onMenuOpen={() => {
+          isCategoryMenuOpenRef.current = true;
+          cancelPendingBlur();
+        }}
+        onMenuClose={() => {
+          isCategoryMenuOpenRef.current = false;
+        }}
+        onSelectCategory={(categoryId) => {
+          updateMutation.mutate({ ...item, category_id: categoryId });
+        }}
+      />
+    </SwipeableRow>
   );
 }

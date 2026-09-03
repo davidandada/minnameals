@@ -15,6 +15,8 @@ export default function AddItem() {
   const [itemName, setItemName] = useState<string>("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const isCategoryMenuOpenRef = useRef<boolean>(false);
 
   const { showSuccess, showError } = useNotification();
   const queryClient = useQueryClient();
@@ -82,6 +84,7 @@ export default function AddItem() {
   };
 
   const handleFormBlur = () => {
+    if (isCategoryMenuOpenRef.current) return;
     blurTimeoutRef.current = setTimeout(resetForm, 200);
   };
 
@@ -113,7 +116,23 @@ export default function AddItem() {
   };
 
   const handleCategorySelect = (newCategoryId: number | null) => {
+    handleFormFocus();
     setCategoryId(newCategoryId);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+  };
+
+  const handleCategoryMenuOpen = () => {
+    isCategoryMenuOpenRef.current = true;
+    handleFormFocus();
+  };
+
+  const handleCategoryMenuClose = () => {
+    isCategoryMenuOpenRef.current = false;
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
   };
 
   return inputShowing ? (
@@ -122,11 +141,21 @@ export default function AddItem() {
       onSubmit={handleSubmit}
       onBlur={handleFormBlur}
       onFocus={handleFormFocus}
-      className="w-full flex gap-2 justify-start items-center text-baedaGrey-50 px-[22px] py-[8px]"
+      sx={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        color: "inherit",
+        px: 1,
+        py: 0.75,
+      }}
     >
-      <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
+      <Box sx={{ p: 0.75, m: -0.75, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", mr: 1.5 }}>
+        <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
+      </Box>
       <TextField
         autoFocus
+        inputRef={inputRef}
         color="baedaPink"
         fullWidth
         multiline
@@ -154,16 +183,32 @@ export default function AddItem() {
       <CategorySelector
         item={dummyItem}
         onSelectCategory={handleCategorySelect}
+        onMenuOpen={handleCategoryMenuOpen}
+        onMenuClose={handleCategoryMenuClose}
       />
     </Box>
   ) : (
     <Button
-      className="w-full normal-case flex gap-2 justify-start text-baedaGrey-50"
       disableRipple
       onClick={() => setInputShowing(true)}
-      size="large"
+      sx={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        textTransform: "none",
+        color: "inherit",
+        px: 1,
+        py: 0.75,
+        borderRadius: "8px",
+        "&:hover": {
+          backgroundColor: "var(--mui-palette-baedaGrey-700)",
+        },
+      }}
     >
-      <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
+      <Box sx={{ p: 0.75, m: -0.75, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", mr: 1.5 }}>
+        <AddCircleIcon sx={{ fontSize: 24 }} className="text-baedaPink-500" />
+      </Box>
       <Typography variant="body2">Add item</Typography>
     </Button>
   );
