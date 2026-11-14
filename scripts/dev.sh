@@ -1,3 +1,3 @@
 #!/bin/bash
 source api/.venv/bin/activate
-vercel dev -L
+vercel dev --local
