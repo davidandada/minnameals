@@ -12,7 +12,7 @@ The application is a hybrid **Next.js frontend** and **Flask Python backend** co
 * **Under the hood**: 
   - This executes `bash scripts/dev.sh`.
   - It automatically activates the Python virtual environment (`.venv`) in the `/api` directory.
-  - It starts the Vercel CLI locally (`vercel dev -L`) to serve both frontend page requests and backend API requests under a single local origin.
+  - It starts the Vercel CLI locally (`vercel dev --local`) to serve both frontend page requests and backend API requests under a single local origin.
 
 ---
 
@@ -59,3 +59,17 @@ The application is a hybrid **Next.js frontend** and **Flask Python backend** co
 * **State Management**: `@tanstack/react-query` is utilized for backend query fetching, caching, and mutation state transitions.
 * **Drag and Drop**: `@dnd-kit/react` and `@dnd-kit/helpers` handle list sorting and reordering events.
 * **List Indexing**: `fractional-indexing` calculates relative position keys of items to prevent full-list indexing operations in Supabase.
+
+---
+
+## 6. Next.js Version Notes & Documentation
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
