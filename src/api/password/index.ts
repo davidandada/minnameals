@@ -8,6 +8,7 @@ export async function submitPasswordAction(password: string) {
 
   cookieStore.set("app_password", password, {
     httpOnly: true,
+    maxAge: 2628000,
     secure: process.env.NODE_ENV === "production",
     path: "/",
   });
