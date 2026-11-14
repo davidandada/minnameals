@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSortable } from "@dnd-kit/react/sortable";
 import {
   Box,
-  Checkbox,
+  IconButton,
   ListItemIcon,
   ListItemText,
   TextField,
@@ -151,36 +151,44 @@ export default function ItemRow({ item, index, disableDrag = false }: Props) {
     >
       {/* Generous Hitbox Checkbox / Radio toggle */}
       <ListItemIcon sx={{ minWidth: 0, mr: 1.5, display: "flex", alignItems: "center" }}>
-        <Box
+        <IconButton
           onClick={(e) => {
             e.stopPropagation();
             handleToggle();
           }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+          }}
+          edge="start"
+          aria-label={isChecked ? "Mark unchecked" : "Mark checked"}
+          disableRipple
+          size="small"
           sx={{
             p: 0.75,
             m: -0.75,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            color: "inherit",
             cursor: "pointer",
             borderRadius: "50%",
-            "&:hover": {
-              backgroundColor: "var(--mui-palette-baedaOrange-100)",
-              opacity: 0.8,
+            "@media (hover: hover)": {
+              "&:hover": {
+                backgroundColor: "var(--mui-palette-baedaOrange-100)",
+                opacity: 0.8,
+              },
+            },
+            "&:focus-visible": {
+              outline: "2px solid var(--mui-palette-baedaOrange-500)",
             },
           }}
-          aria-label={isChecked ? "Mark unchecked" : "Mark checked"}
         >
-          <Checkbox
-            checked={isChecked}
-            checkedIcon={<CheckCircleIcon sx={{ fontSize: 24 }} className="text-baedaOrange-200" />}
-            disableRipple
-            icon={<CircleOutlinedIcon sx={{ fontSize: 24 }} className="text-baedaGrey-50" />}
-            slotProps={{ input: { "aria-labelledby": `shopping-list-item-${item.id}` } }}
-            tabIndex={-1}
-            sx={{ p: 0, pointerEvents: "none" }}
-          />
-        </Box>
+          {isChecked ? (
+            <CheckCircleIcon sx={{ fontSize: 24 }} className="text-baedaOrange-200" />
+          ) : (
+            <CircleOutlinedIcon sx={{ fontSize: 24 }} className="text-baedaGrey-50" />
+          )}
+        </IconButton>
       </ListItemIcon>
 
       {/* Row Text Content / Inline Edit Form */}

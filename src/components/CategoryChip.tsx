@@ -32,13 +32,15 @@ export default function CategoryChip({ category, iconOnly = false, onClick, sx }
             pr: 0.5,
             fontWeight: "bold",
           },
-          "&:hover": onClick
-            ? {
+          ...(onClick && {
+            "@media (hover: hover)": {
+              "&:hover": {
                 borderColor: "var(--mui-palette-baedaOrange-300)",
                 color: "var(--mui-palette-baedaOrange-200)",
                 backgroundColor: "rgba(255, 192, 107, 0.08)",
-              }
-            : undefined,
+              },
+            },
+          }),
           ...sx,
         }}
       />
@@ -81,11 +83,13 @@ export default function CategoryChip({ category, iconOnly = false, onClick, sx }
             alignItems: "center",
           },
         }),
-        "&:hover": onClick
-          ? {
+        ...(onClick && {
+          "@media (hover: hover)": {
+            "&:hover": {
               backgroundColor: `color-mix(in srgb, var(--mui-palette-${colour}-500) 25%, transparent)`,
-            }
-          : undefined,
+            },
+          },
+        }),
         ...sx,
       }}
     />

@@ -44,9 +44,15 @@ export default function SwipeableRow({
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [swipeOffset, setSwipeOffset] = useState<number>(0);
   const isSwipingHorizontally = useRef<boolean | null>(null);
+  const hasSwipedRef = useRef<boolean>(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (disabled || isDeleting) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.closest("button, input, textarea, select, a, [data-no-swipe]")) {
+      return;
+    }
+    hasSwipedRef.current = false;
     setTouchStartX(e.touches[0].clientX);
     setTouchStartY(e.touches[0].clientY);
     isSwipingHorizontally.current = null;
@@ -60,12 +66,13 @@ export default function SwipeableRow({
     const diffY = currentY - touchStartY;
 
     if (isSwipingHorizontally.current === null) {
-      if (Math.abs(diffX) > 6 || Math.abs(diffY) > 6) {
+      if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) {
         isSwipingHorizontally.current = Math.abs(diffX) > Math.abs(diffY);
       }
     }
 
     if (isSwipingHorizontally.current) {
+      hasSwipedRef.current = true;
       // Only allow swiping left (negative offset)
       const offset = Math.min(0, diffX);
       setSwipeOffset(offset);
@@ -87,11 +94,17 @@ export default function SwipeableRow({
     setTouchStartX(null);
     setTouchStartY(null);
     isSwipingHorizontally.current = null;
+    if (hasSwipedRef.current) {
+      setTimeout(() => {
+        hasSwipedRef.current = false;
+      }, 100);
+    }
   };
 
   const handleClick = () => {
-    if (swipeOffset !== 0) {
+    if (swipeOffset !== 0 || hasSwipedRef.current) {
       setSwipeOffset(0);
+      hasSwipedRef.current = false;
       return;
     }
     onClick?.();

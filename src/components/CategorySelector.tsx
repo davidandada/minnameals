@@ -103,6 +103,9 @@ export default function CategorySelector({ item, onSelectCategory, disabled, ico
   return (
     <Box
       onClick={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      data-no-swipe
       sx={{
         display: "flex",
         alignItems: "center",
