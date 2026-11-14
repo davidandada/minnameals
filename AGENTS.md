@@ -30,7 +30,7 @@ The application is a hybrid **Next.js frontend** and **Flask Python backend** co
 * **State Management**: Uses `@tanstack/react-query` (`useQuery`, `useMutation`) for all server state caches.
 * **UI & Styling**: Material UI (MUI) components mixed with Tailwind CSS for layouts and spacing utility classes.
 * **Alert Notifications**: Centralized alerts managed globally by the notification manager (`NotificationProvider` context and `useNotification` hook) at the root layout level, rather than rendering local `<Snackbar>` components.
-* **API Endpoints**: Always query against `/v1/item` and `/v1/category` endpoints.
+* **API Endpoints**: Always query against `/v1/item` and `/v1/categories` endpoints.
 * **Error Handling**: Use the client fetch wrapper `src/api/fetch.ts` to execute requests. It automatically handles session redirects (401) and intercepts raw HTML/text exceptions safely.
 
 ---

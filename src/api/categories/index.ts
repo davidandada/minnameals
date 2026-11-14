@@ -6,7 +6,7 @@ import { type CategoryApi } from "@/types/api/category";
 
 export async function getCategories() {
   const cookieHeader = await getAuthCookie();
-  return appFetch<CategoryApi[]>("v1/category", { method: "GET" }, cookieHeader);
+  return appFetch<CategoryApi[]>("v1/categories", { method: "GET" }, cookieHeader);
 }
 
 export async function createCategory({
@@ -20,7 +20,7 @@ export async function createCategory({
 }) {
   const cookieHeader = await getAuthCookie();
   const data = await appFetch<CategoryApi[]>(
-    "v1/category",
+    "v1/categories",
     {
       method: "POST",
       body: { name, emoji, colour },
@@ -33,7 +33,7 @@ export async function createCategory({
 export async function updateCategory(category: Partial<CategoryApi> & { id: number }) {
   const cookieHeader = await getAuthCookie();
   const data = await appFetch<CategoryApi[]>(
-    "v1/category",
+    "v1/categories",
     {
       method: "PATCH",
       body: category,

@@ -40,7 +40,7 @@ export default function ShoppingList() {
     queryFn: getListItems,
     refetchInterval: () => (process.env.NODE_ENV === "development" ? false : 3000),
   });
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
   const sortMutation = useMutation({
     mutationFn: updateListItem,
@@ -176,7 +176,7 @@ export default function ShoppingList() {
       {/* Only Scrollable Element: Shopping List */}
       <Box className="flex-1 overflow-y-auto min-h-0 pr-1">
         <List className="flex flex-col gap-2">
-          {!isSortModeReady || isLoading ? (
+          {!isSortModeReady || isLoading || (sortMode === "category" && isCategoriesLoading) ? (
             renderSkeletonList()
           ) : sortMode === "category" ? (
             renderCategoryGroupedList(uncheckedItems)
